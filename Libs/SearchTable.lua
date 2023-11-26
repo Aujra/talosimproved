@@ -246,4 +246,3 @@ local function Constructor(params)
 end
 
 AceGUI:RegisterWidgetType(Type, Constructor, Version)
-print("DONE")

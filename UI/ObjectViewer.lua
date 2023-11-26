@@ -9,8 +9,25 @@ local scrollcontainer = nil
 local scroll = nil
 local ScrollTable = nil
 
+ObjectViewer.mode = "objects"
+
 local cols = { 
 }
+
+function tt:SelectGroup(group)
+    print("SelectGroup", group)
+    if group == "objects" then
+        ObjectViewer.mode = "objects"
+    end
+    if group == "players" then
+        ObjectViewer.mode = "players"
+    end
+    if group == "units" then
+        ObjectViewer.mode = "units"
+    end
+    local str = string.gsub(" "..ObjectViewer.mode, "%W%l", string.upper):sub(2)
+    OMFrame:SetTitle("Object Manager - " .. str)
+end
 
 function tt:AddColumn(name)
     local column = {
@@ -42,9 +59,23 @@ end
 
 function tt:updateObjectViewer()
     local data = {}
-    for k,v in pairs(tt.units) do
-        local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), v.HP}
-        table.insert(data, tree)
+    if ObjectViewer.mode == "objects" then
+        for k,v in pairs(tt.gameobjects) do
+            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            table.insert(data, tree)
+        end
+    end
+    if ObjectViewer.mode == "players" then
+        for k,v in pairs(tt.players) do
+            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            table.insert(data, tree)
+        end
+    end
+    if ObjectViewer.mode == "units" then
+        for k,v in pairs(tt.units) do
+            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            table.insert(data, tree)
+        end
     end
     ScrollTable:SetData(data, true)
     ScrollTable:SetWidth(950)    
@@ -54,9 +85,28 @@ end
 
 if not OMFrame then
     OMFrame = AceGUI:Create("Window", "ObjectViewerFrame", UIParent)
-    OMFrame:SetTitle("Object Manager")
+    local str = string.gsub(" "..ObjectViewer.mode, "%W%l", string.upper):sub(2)
+    OMFrame:SetTitle("Object Manager - " .. str)
     OMFrame:SetLayout("Flow")
     OMFrame:SetWidth(1024) 
+
+    local objectbutton = AceGUI:Create("Button")
+    objectbutton:SetText("Objects")
+    objectbutton:SetWidth(100)
+    objectbutton:SetCallback("OnClick", function() tt:SelectGroup("objects") end)
+    OMFrame:AddChild(objectbutton)
+
+    local playerbutton = AceGUI:Create("Button")
+    playerbutton:SetText("Players")
+    playerbutton:SetWidth(100)
+    playerbutton:SetCallback("OnClick", function() tt:SelectGroup("players") end)
+    OMFrame:AddChild(playerbutton)
+
+    local unitsbutton = AceGUI:Create("Button")
+    unitsbutton:SetText("Units")
+    unitsbutton:SetWidth(100)
+    unitsbutton:SetCallback("OnClick", function() tt:SelectGroup("units") end)
+    OMFrame:AddChild(unitsbutton)
 
     tt:AddColumn("Name")
     tt:AddColumn("Distance")

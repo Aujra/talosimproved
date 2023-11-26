@@ -33,5 +33,7 @@ Engine\OM.lua
 
 Classes\GameObject.lua
 Classes\Unit.lua
+Classes\Player.lua
 
 UI\ObjectViewer.lua     
+UI\HUD.lua

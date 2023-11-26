@@ -27,6 +27,13 @@ function tt:UpdateOM()
                     tt.units[v] = tt.Classes.Unit(v)
                 end
             end
+            if dmc.ObjectType(v) == 6 then
+                if tt.players[v] then
+                    tt.players[v]:Update(v)
+                else
+                    tt.players[v] = tt.Classes.Player(v)
+                end
+            end
         end
     end
     tt:ClearOldObjects()
@@ -41,6 +48,11 @@ function tt:ClearOldObjects()
     for k,v in pairs(tt.units) do
         if not dmc.ObjectExists(v.pointer) then
             tt.units[k] = nil
+        end
+    end
+    for k,v in pairs(tt.players) do
+        if not dmc.ObjectExists(v.pointer) then
+            tt.players[k] = nil
         end
     end
 end
