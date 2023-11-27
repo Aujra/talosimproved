@@ -9,10 +9,21 @@ local scrollcontainer = nil
 local scroll = nil
 local ScrollTable = nil
 
+local green ="|cFF00FF00"
+local red ="|cffff0000"
+
 ObjectViewer.mode = "objects"
 
 local cols = { 
 }
+
+function tt:ToggleObjectViewer()
+    if OMFrame:IsShown() then
+        OMFrame:Hide()
+    else
+        OMFrame:Show()
+    end
+end
 
 function tt:SelectGroup(group)
     print("SelectGroup", group)
@@ -61,19 +72,28 @@ function tt:updateObjectViewer()
     local data = {}
     if ObjectViewer.mode == "objects" then
         for k,v in pairs(tt.gameobjects) do
-            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            local tree = {"", v.Name, string.format("%0d",v.Distance), 0, 0, 0, 0, string.format("%02d",v.HP)}
             table.insert(data, tree)
         end
     end
     if ObjectViewer.mode == "players" then
+        table.sort(tt.players, function(x, y)
+            return x.score > y.score
+        end)
         for k,v in pairs(tt.players) do
-            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            local react = ""
+            if v.Reaction <= 3 then
+                react = "Hostile"
+            else
+                react = "Friendly"
+            end
+            local tree = {react,v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), string.format("%0d", v.targetScore), string.format("%02d",v.HP)}
             table.insert(data, tree)
         end
     end
     if ObjectViewer.mode == "units" then
         for k,v in pairs(tt.units) do
-            local tree = {v.Name, string.format("%0d",v.Distance), v:GetEnemiesAround(30), v:GetFriendsAround(30), string.format("%02d",v.HP)}
+            local tree = {"", v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), v.targetScore, string.format("%02d",v.HP)}
             table.insert(data, tree)
         end
     end
@@ -108,10 +128,13 @@ if not OMFrame then
     unitsbutton:SetCallback("OnClick", function() tt:SelectGroup("units") end)
     OMFrame:AddChild(unitsbutton)
 
+    tt:AddColumn("Reaction")
     tt:AddColumn("Name")
     tt:AddColumn("Distance")
-    tt:AddColumn("Enemies")
     tt:AddColumn("Friends")
+    tt:AddColumn("Enemies")
+    tt:AddColumn("Score")
+    tt:AddColumn("TargetScore")
     tt:AddColumn("HP")
 
     if ScrollTable == nil then

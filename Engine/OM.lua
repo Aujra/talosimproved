@@ -13,6 +13,9 @@ function tt:UpdateOM()
 
     if #added > 0 then
         for _, v in pairs(added) do 
+            if dmc.ObjectType(v) == 7 then
+                tt.LocalPlayer = tt.Classes.LocalPlayer(v)
+            end
             if dmc.ObjectType(v) == 8 then
                 if tt.gameobjects[v] then
                     tt.gameobjects[v]:Update(v)
@@ -37,6 +40,24 @@ function tt:UpdateOM()
         end
     end
     tt:ClearOldObjects()
+end
+
+function tt:GetObjectByGUID(guid)
+    for k,v in pairs(tt.gameobjects) do
+        if v.pointer == guid then
+            return v
+        end
+    end
+    for k,v in pairs(tt.units) do
+        if v.pointer == guid then
+            return v
+        end
+    end
+    for k,v in pairs(tt.players) do
+        if v.pointer == guid then
+            return v
+        end
+    end
 end
 
 function tt:ClearOldObjects()

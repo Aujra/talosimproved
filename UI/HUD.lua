@@ -6,15 +6,25 @@ local HUDFrame = HUD.Frames
 local green ="|cFF00FF00"
 local red ="|cffff0000"
 local white ="|cffffffff"
+local botBaseIndex = 1
+local botBaseNames = {}
+local rotationIndex = 1
+local rotationNames = {}
+for k,v in pairs(tt.botbases) do
+    table.insert(botBaseNames, k)
+end
+for k,v in pairs(tt.rotations) do
+    table.insert(rotationNames, k)
+end
 
 function HUD:CreateHUDFrame(name, width, offset, rel, heightoff)
     print("CreateHUDFrame", name, width, offset, rel, heightoff)
-    heightoff = heightoff and heightoff or 15
-    local f = CreateFrame("BUTTON", name, HUDFrame)
+    heightoff = heightoff and heightoff or 10
+    local f = CreateFrame("Button", name, HUDFrame)
     f:SetNormalFontObject(GameFontNormalSmall)
     f:SetHighlightFontObject(GameFontHighlightSmall)
     f:SetWidth(width)
-    f:SetHeight(30)
+    f:SetHeight(20)
     f:SetPoint("TOP", HUDFrame, rel, offset, heightoff)
     return f
 end
@@ -26,9 +36,9 @@ HUDFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
 
 HUDFrame.tex = HUDFrame:CreateTexture()
 HUDFrame.tex:SetAllPoints(HUDFrame)
-HUDFrame.tex:SetTexture("Interface/Tooltips/UI-Tooltip-Background")
+HUDFrame.tex:SetColorTexture(0, 0, 0, 0.9)
 
-HUDFrame.Running = HUD:CreateHUDFrame("Running", 100, 50, "LEFT")
+HUDFrame.Running = HUD:CreateHUDFrame("Running", 50, 400, "LEFT")
 if tt.running then
     HUDFrame.Running:SetText(green.."Running")
 else
@@ -44,3 +54,59 @@ HUDFrame.Running:SetScript("OnClick", function(self, button, down)
     end
 end)
 
+HUDFrame.Botbase = HUD:CreateHUDFrame("Botbase", 50, 50, "LEFT")
+HUDFrame.Botbase:SetText(white..botBaseNames[botBaseIndex])
+HUDFrame.Botbase:SetScript("OnClick", function()
+    botBaseIndex = botBaseIndex + 1
+    if (botBaseIndex > #botBaseNames) then
+        botBaseIndex = 1
+    end
+    tt.botbase = botBaseNames[botBaseIndex]
+    HUDFrame:Update()
+end)
+HUDFrame.Botbase:Show()
+
+HUDFrame.Rotation = HUD:CreateHUDFrame("Rotation", 50, 200, "LEFT")
+HUDFrame.Rotation:SetText(white..rotationNames[rotationIndex])
+HUDFrame.Rotation:SetScript("OnClick", function()
+    rotationIndex = rotationIndex + 1
+    if (rotationIndex > #rotationNames) then
+        rotationIndex = 1
+    end
+    tt.rotation = rotationNames[rotationIndex]
+    HUDFrame:Update()
+end)
+HUDFrame.Botbase:Show()
+
+HUDFrame.ToggleObjectViewer = HUD:CreateHUDFrame("ObjectManager", 150, 800, "LEFT")
+HUDFrame.ToggleObjectViewer:SetText("Toggle ObjectManager")
+HUDFrame.ToggleObjectViewer:SetScript("OnClick", function()
+    tt:ToggleObjectViewer()
+end)
+HUDFrame.ToggleObjectViewer:Show()
+
+HUDFrame.ToggleDebug = HUD:CreateHUDFrame("ToggleDebug", 150, 600, "LEFT")
+HUDFrame.ToggleDebug:SetText("Toggle Debugging")
+HUDFrame.ToggleDebug:SetScript("OnClick", function()
+    if tt.doDebugging then
+        tt.doDebugging = false
+    else
+        tt.doDebugging = true
+    end
+    print("Debugging is now", tt.doDebugging)
+end)
+HUDFrame.ToggleDebug:Show()
+
+function HUDFrame:Update()
+    HUDFrame.Botbase:SetText(white..botBaseNames[botBaseIndex])
+    HUDFrame.Rotation:SetText(white..rotationNames[rotationIndex])
+    if tt.running then
+        HUDFrame.Running:SetText(green.."Running")
+    else
+        HUDFrame.Running:SetText(red.."Stopped")
+    end
+end
+
+function tt:UpdateHUD()
+    HUDFrame:Update()
+end

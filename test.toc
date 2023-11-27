@@ -28,12 +28,24 @@ Libs\SearchTable.lua
 
 Core\class.lua
 Core\core.lua
+Core\Registers.lua
 
 Engine\OM.lua
+Engine\Navigation.lua
 
 Classes\GameObject.lua
 Classes\Unit.lua
 Classes\Player.lua
+Classes\LocalPlayer.lua
+
+BotBases\BGBot.lua
+BotBases\RotationBot.lua
+
+Rotations\External.lua
+Rotations\Druid.lua
+Rotations\Warrior.lua
+Rotations\Mage.lua
 
 UI\ObjectViewer.lua     
 UI\HUD.lua
+UI\StatusBar.lua

@@ -257,7 +257,7 @@ do
 
             col:SetFontString(fs);
             fs:SetText(cols[i].name);
-            fs:SetTextColor(1.0, 1.0, 1.0, 1.0);
+            fs:SetTextColor(0, 1.0, 1.0, 1.0);
             col:SetPushedTextOffset(0,0);
 
             if i > 1 then
