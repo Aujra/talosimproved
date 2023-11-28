@@ -37,9 +37,11 @@ Classes\GameObject.lua
 Classes\Unit.lua
 Classes\Player.lua
 Classes\LocalPlayer.lua
+Classes\Spot.lua
 
 BotBases\BGBot.lua
 BotBases\RotationBot.lua
+BotBases\DungeonBot.lua
 
 Rotations\External.lua
 Rotations\Druid.lua
@@ -49,3 +51,4 @@ Rotations\Mage.lua
 UI\ObjectViewer.lua     
 UI\HUD.lua
 UI\StatusBar.lua
+UI\ShowSpots.lua

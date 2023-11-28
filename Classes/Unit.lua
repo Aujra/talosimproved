@@ -13,6 +13,8 @@ function Unit:init(point)
     self.FriendsAround = 0
     self.Dead = localenv["UnitIsDead"](self.pointer)
     self.targetScore = 0
+    self.attackable = localenv["UnitCanAttack"]("player", point)
+    self.LOS = false
 end
 
 function Unit:Update()
@@ -23,10 +25,18 @@ function Unit:Update()
     self.HealthMax = localenv["UnitHealthMax"](self.pointer)
     self.FriendsAround = tt.botbases.BGBot:FriendsAround(60)
     self.EnemiesAround = tt.botbases.BGBot:EnemiesAround(60)
+    self.attackable = localenv["UnitCanAttack"]("player", self.pointer)
+    self.LOS = self:LOS()
 end
 
 function Unit:LOS()
-
+    local x,y,z = dmc.GetUnitPosition("player")
+    local x2,y2,z2 = dmc.GetUnitPosition(self.pointer)
+    local hit = dmc.TraceLine(x,y,z,x2,y2,z2, 0x10)
+    if hit == 0 then
+        return true
+    end
+    return false
 end
 
 function Unit:GetScore()

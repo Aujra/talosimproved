@@ -4,6 +4,13 @@ local BGBot = tt.botbases.BGBot
 
 BGBot.name = "BGBot"
 
+local acceptedtime = 0
+
+tt.movespot = {
+}
+tt.badspot = {
+}
+
 function BGBot:Pulse()
     self:GetBestMove()
     if not UnitInBattleground("player") then
@@ -14,12 +21,23 @@ function BGBot:Pulse()
             localenv["RunMacroText"]("/click HonorFrameQueueButton")
             tt:SetStatusText("Queueing for BG")
         end
-        if GetBattlefieldStatus(1) == "confirm" then
+        if GetBattlefieldStatus(1) == "confirm" then             
           localenv["AcceptBattlefieldPort"](1, true)
           tt:SetStatusText("Accepting BG")
         end
         tt:SetStatusText("Waiting for BG currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
     else
+        if tt.time - acceptedtime > 25 then
+            print("flushing om")
+            tt:FlushOM()
+            acceptedtime = tt.time
+        end
+
+        if TimerTrackerTimer1 ~= nil and TimerTrackerTimer1.barShowning then
+            tt:SetStatusText("Waiting for BG to start")
+            return
+        end
+
         if GetBattlefieldWinner() then
             LeaveBattlefield()
             return
@@ -36,6 +54,20 @@ function BGBot:Pulse()
         if point ~= nil then
             tt:SetStatusText("Moving off boat")
             localenv["MoveForwardStart"]()
+            local x, y, z = dmc.GetUnitPosition("player")
+            local px, py, pz = 5,31,34
+            local dx, dy, dz = x-px, y-py, z-pz
+            local radians = math.atan2(-dy, -dx)
+            if dmc.GetDistance3D(x,y,z, px, py, pz) < 10 then
+                return
+            end
+            dmc.FaceDirection(radians, false)
+            return
+        end
+
+        if self:InMoveSpot() then
+            print("in move spot")
+            return
         end
 
         local bestmove = self:GetBestMove()
@@ -44,18 +76,31 @@ function BGBot:Pulse()
 
         if besttarget ~= nil then closest = besttarget end
         if closest ~= nil then
-            if dmc.GetDistance3D("player", closest.pointer) > tt.pullrange then
-                tt:NavTo(dmc.GetUnitPosition(closest.pointer))
-                tt.draw:ClearCanvas()
-                tt.draw:SetColor(0, 255, 0, 255)
-                tt.draw:Line(dmc.GetUnitPosition("player"), dmc.GetUnitPosition(closest.pointer))
-                tt:SetStatusText("Moving to " .. closest.Name .. " at " .. closest.Distance .. " yards to fight")
+            if dmc.GetDistance3D("player", closest.pointer) > tt.combatrange then
+                if dmc.GetDistance3D("player", closest.pointer) > tt.pullrange and UnitAffectingCombat("player") then
+                    tt:NavTo(dmc.GetUnitPosition(closest.pointer))
+                    tt.draw:ClearCanvas()
+                    tt.draw:SetColor(0, 255, 0, 255)
+                    tt.draw:Line(dmc.GetUnitPosition("player"), dmc.GetUnitPosition(closest.pointer))
+                    tt:SetStatusText("Moving to " .. closest.Name .. " at " .. closest.Distance .. " yards to fight")
+                else
+                    localenv["TargetUnit"](closest.pointer)
+                    tt:SetStatusText("Fighting in BG with " .. closest.Name .. " at " .. dmc.GetDistance3D(closest.pointer, "player") .. " yards")
+                    localenv["MoveForwardStop"]()
+                    tt.rotations[tt.rotation]:Pulse()
+                    if dmc.GetDistance3D("player", closest.pointer) > tt.combatrange then
+                        tt:NavTo(dmc.GetUnitPosition(closest.pointer))
+                    else
+                    tt.rotations[tt.rotation]:Pulse()
+                    return
+                    end
+                end
                 return
             else
                 localenv["TargetUnit"](closest.pointer)
                 tt:SetStatusText("Fighting in BG with " .. closest.Name .. " at " .. dmc.GetDistance3D(closest.pointer, "player") .. " yards")
                 localenv["MoveForwardStop"]()
-                tt.rotations[tt.rotation]:Pull()
+                tt.rotations[tt.rotation]:Pulse()
                 if dmc.GetDistance3D("player", closest.pointer) > tt.combatrange then
                     tt:NavTo(dmc.GetUnitPosition(closest.pointer))
                 else
@@ -74,6 +119,38 @@ function BGBot:Pulse()
         end
     end
     local bestmove = self:GetBestMove()
+end
+
+local spot = tt.Classes.Spot(631.87835693359, 232.57249450684, 328.83819580078, 727, 671.68951416016, 222.47822570801, 320.1237487793)
+local spots = tt.Classes.Spot(1816.8699951172, 160.08299255371, 1.8064399957657, 726, 1812.6453857422, 200.64604187012, -20.939380645752)
+tinsert(tt.movespot, spot)
+tinsert(tt.movespot, spots)
+
+local bspot = tt.Classes.Spot(1803.0208740234, 1539.9670410156, 1249.1867675781, 566, 671.68951416016, 222.47822570801, 320.1237487793)
+tinsert(tt.badspot, bspot)
+
+function BGBot:InMoveSpot()
+    local x, y, z = dmc.GetUnitPosition("player")
+    for k,v in pairs(tt.movespot) do
+        if dmc.GetMapID() == v.mapId and dmc.GetDistance3D(x,y,z,v.x,v.y,v.z) < 35 then
+            local px, py, pz = v.facex, v.facey, v.facez
+            local dx, dy, dz = x-px, y-py, z-pz
+            local radians = math.atan2(-dy, -dx)
+            localenv["MoveForwardStart"]()
+            return true
+        end
+    end
+    return false
+end
+
+function BGBot:IsInSpawn(x,y,z)
+    for k,v in pairs(tt.badspot) do
+        if dmc.GetDistance3D(x,y,z,v.x,v.y,v.z) < 35 then
+            print("in bad spot not going here")
+            return true
+        end
+    end
+    return false
 end
 
 function tt:ConvertToMS(milliseconds)
@@ -110,7 +187,7 @@ function BGBot:GetBestMove()
                 end
             score = score + (enemies * HostileScore) + (friends * FriendlyScore)
 
-            if (enemies * HostileScore) > ((friends * FriendlyScore) * 3.5) or (enemies < 1) then
+            if (enemies * HostileScore) > ((friends * FriendlyScore) * 3.5) or (enemies < 1) or (friends <= 1) then
                 score = score - 1000
             end
 
@@ -118,12 +195,16 @@ function BGBot:GetBestMove()
             v.EnemiesAround = enemies   
             v.FriendsAround = friends
 
-            if (v.Distance ~= nil and v.Distance > 1000) or UnitIsDeadOrGhost(v.pointer) then
+            if (v.Distance ~= nil and v.Distance > 2000) or UnitIsDeadOrGhost(v.pointer) then
                 score = 1
             end
             if v.Distance == nil then score = 1 end
 
-            if score ~= nil and score > bestscore then
+            if self:IsInSpawn(v.x,v.y,v.z) then
+                score = 1
+            end
+
+            if score ~= nil and score < 1700 and score > bestscore then
                 bestscore = score
                 bestmove = v
             end
@@ -137,7 +218,7 @@ function BGBot:BestTarget()
     local bestscore = 0
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and dmc.GetDistance3D("player", v.pointer) < 100 and v.Reaction <= 3 and not v.Dead then
+            if v.Distance ~= nil and dmc.GetDistance3D("player", v.pointer) < 75 and v.Reaction <= 3 and not v.Dead then
                 local score = 1000
                 score = score - dmc.GetDistance3D("player", v.pointer)
                 score = score + (v.Health / v.HealthMax / 5)
@@ -173,7 +254,7 @@ function BGBot:EnemiesAround(range)
     local enemies = 0
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and v.Distance < range and v.Reaction <= 3 then
+            if v.Distance ~= nil and v.Distance < range and v.Reaction <= 3 and not v.Dead then
                 enemies = enemies + 1
             end
         end
@@ -185,7 +266,7 @@ function BGBot:FriendsAround(range)
     local friends = 0
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and v.Distance < range and v.Reaction >= 5 then
+            if v.Distance ~= nil and v.Distance < range and v.Reaction >= 5 and not v.Dead then
                 friends = friends + 1
             end
         end

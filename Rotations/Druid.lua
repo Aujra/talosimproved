@@ -28,13 +28,15 @@ function Druid:Pulse()
 
         local tarob = tt:GetObjectByGUID(tar)
 
+        print(tarob.Name)
+
         if GetShapeshiftForm() ~= 4 then
             tt:Cast("Moonkin Form", "player")
         end
-        if not self:HasDebuff("Moonfire", tar) then
+        if not self:HasDebuff("Moonfire", tarob.pointer) then
             tt:Cast("Moonfire", tar)
         end
-        if not self:HasDebuff("Sunfire", tar) then
+        if not self:HasDebuff("Sunfire", tarob.pointer) then
             tt:Cast("Sunfire", tar)
         end
         tt:Cast("Convoke the Spirits", tar)

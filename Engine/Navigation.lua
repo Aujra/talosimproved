@@ -14,7 +14,7 @@ function tt:NavTo(x,y,z)
         end
     end
     local mapId = dmc.GetMapID()
-    local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z )
+    local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z, true )
     if PathCnt == 0 then return end
     local P2X, P2Y, P2Z = dmc.GetPathNode(2)
     local P2Dist = dmc.GetDistance3D(px, py, pz, P2X, P2Y, P2Z)

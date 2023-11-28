@@ -23,8 +23,8 @@ local lastOMUpdate = 0
 tt.draw = nil
 tt.scoredraw = nil
 
-tt.combatrange = 30
-tt.pullrange = 30
+tt.combatrange = 25
+tt.pullrange = 35
 
 setfenv(1, localenv)
 

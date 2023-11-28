@@ -142,4 +142,25 @@ if not OMFrame then
     end
 
     tt:updateObjectViewer()
+
+    local pullrange = tt.AceGUI:Create("EditBox")
+    pullrange:SetLabel("Pull Range")
+    pullrange:SetWidth(100)
+    pullrange:SetText(tt.pullrange)
+    pullrange:SetCallback("OnEnterPressed", function(self, event, text)
+        tt.pullrange = tonumber(text)
+        print("tt.pullrange", tt.pullrange)
+    end)
+    OMFrame:AddChild(pullrange)
+
+    local combatrange = tt.AceGUI:Create("EditBox")
+    combatrange:SetLabel("Combat Range")
+    combatrange:SetWidth(100)
+    combatrange:SetText(tt.combatrange)
+    combatrange:SetCallback("OnEnterPressed", function(self, event, text)
+        tt.combatrange = tonumber(text)
+        print("tt.combatrange", tt.combatrange)
+    end)
+    OMFrame:AddChild(combatrange)
+
 end
