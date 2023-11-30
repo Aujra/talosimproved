@@ -2,7 +2,6 @@ local tt = tt
 
 function tt:NavTo(x,y,z)
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then
-        localenv["MoveForwardStop"]()
         return
     end
 
@@ -15,8 +14,13 @@ function tt:NavTo(x,y,z)
     end
     local mapId = dmc.GetMapID()
     local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z, true )
-    if PathCnt == 0 then return end
+    if PathCnt == 0 then 
+        return 
+    end
     local P2X, P2Y, P2Z = dmc.GetPathNode(2)
+    if P2X == nil then
+        return
+    end
     local P2Dist = dmc.GetDistance3D(px, py, pz, P2X, P2Y, P2Z)
     local PathDist2 = dmc.GetDistance3D(PathX, PathY, PathZ, P2X, P2Y, P2Z)
 

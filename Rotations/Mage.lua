@@ -8,7 +8,7 @@ function Mage:init()
 end
 
 function Mage:Pull()
-    if UnitAffectingCombat("player") then
+    if localenv["UnitAffectingCombat"]("player") then
         return self:Pulse()
     end
     tt:Cast("Fireball", tar)

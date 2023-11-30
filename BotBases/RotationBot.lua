@@ -8,7 +8,7 @@ function RotationBot:init()
 end
 
 function RotationBot:Pulse()
-    if UnitAffectingCombat("player") then
+    if localenv["UnitAffectingCombat"]("player") then
         print("Pulsing")
         tt.rotations[tt.rotation]:Pulse()
     end

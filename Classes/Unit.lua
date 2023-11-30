@@ -14,7 +14,6 @@ function Unit:init(point)
     self.Dead = localenv["UnitIsDead"](self.pointer)
     self.targetScore = 0
     self.attackable = localenv["UnitCanAttack"]("player", point)
-    self.LOS = false
 end
 
 function Unit:Update()
@@ -26,7 +25,18 @@ function Unit:Update()
     self.FriendsAround = tt.botbases.BGBot:FriendsAround(60)
     self.EnemiesAround = tt.botbases.BGBot:EnemiesAround(60)
     self.attackable = localenv["UnitCanAttack"]("player", self.pointer)
-    self.LOS = self:LOS()
+    self.los = self:LOS()
+end
+
+function Unit:HasPath()
+    local x,y,z = dmc.GetUnitPosition("player")
+    local mapId = dmc.GetMapID()
+    local PathCnt = dmc.FindPath(mapId, self.x, self.y, self.z, x, y, z, true )
+    if PathCnt == 0 then 
+        return false
+    else
+        return true
+    end
 end
 
 function Unit:LOS()

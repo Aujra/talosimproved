@@ -8,7 +8,6 @@ function Warrior:init()
 end
 
 function Warrior:Pull()
-    tt:Cast("Charge", "target")
 end
 
 function Warrior:Pulse()
@@ -27,6 +26,8 @@ function Warrior:Pulse()
         dmc.FaceDirection(radians, false)
 
         local tarob = tt:GetObjectByGUID(tar)
+
+        tt:Cast("Charge", "target")
 
         if not self:HasDebuff("Rend", tar) then
             tt:Cast("Rend", tar)

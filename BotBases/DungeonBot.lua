@@ -12,8 +12,9 @@ function DungeonBot:Pulse()
         local enemy = self:GetNearestEnemy()
         if enemy then
             local x,y,z = dmc.GetUnitPosition("player")
-            if dmc.GetDistance3D(enemy.x, enemy.y, enemy.z, x,y,z) > 30 then
+            if dmc.GetDistance3D(enemy.x, enemy.y, enemy.z, x,y,z) > tt.combatrange then
                 tt:NavTo(enemy.x, enemy.y, enemy.z)
+                tt.rotations[tt.rotation]:Pulse()
             else
                 localenv["MoveForwardStop"]()
                 localenv["TargetUnit"](enemy.pointer)

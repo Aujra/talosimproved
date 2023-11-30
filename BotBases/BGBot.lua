@@ -5,6 +5,7 @@ local BGBot = tt.botbases.BGBot
 BGBot.name = "BGBot"
 
 local acceptedtime = 0
+local changetargettime = 0
 
 tt.movespot = {
 }
@@ -21,18 +22,17 @@ function BGBot:Pulse()
             localenv["RunMacroText"]("/click HonorFrameQueueButton")
             tt:SetStatusText("Queueing for BG")
         end
+        if GetBattlefieldStatus(1) == "queued" then
+            tt:SetStatusText("Waiting for BG to pop currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
+            if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
+                TogglePVPUI()
+            end
+        end                                                 
         if GetBattlefieldStatus(1) == "confirm" then             
           localenv["AcceptBattlefieldPort"](1, true)
           tt:SetStatusText("Accepting BG")
         end
-        tt:SetStatusText("Waiting for BG currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
     else
-        if tt.time - acceptedtime > 25 then
-            print("flushing om")
-            tt:FlushOM()
-            acceptedtime = tt.time
-        end
-
         if TimerTrackerTimer1 ~= nil and TimerTrackerTimer1.barShowning then
             tt:SetStatusText("Waiting for BG to start")
             return
@@ -69,15 +69,14 @@ function BGBot:Pulse()
             print("in move spot")
             return
         end
-
-        local bestmove = self:GetBestMove()
         local closest = self:ClosestTarget()
+        local bestmove = self:GetBestMove()
         local besttarget = self:BestTarget()
 
         if besttarget ~= nil then closest = besttarget end
         if closest ~= nil then
             if dmc.GetDistance3D("player", closest.pointer) > tt.combatrange then
-                if dmc.GetDistance3D("player", closest.pointer) > tt.pullrange and UnitAffectingCombat("player") then
+                if dmc.GetDistance3D("player", closest.pointer) > tt.pullrange and localenv["UnitAffectingCombat"]("player") then
                     tt:NavTo(dmc.GetUnitPosition(closest.pointer))
                     tt.draw:ClearCanvas()
                     tt.draw:SetColor(0, 255, 0, 255)
@@ -110,7 +109,7 @@ function BGBot:Pulse()
             end
         end
         if bestmove ~= nil and dmc.GetDistance3D(bestmove.pointer, "player") > tt.combatrange then
-            tt:SetStatusText("Moving to " .. bestmove.Name .. " at " .. dmc.GetDistance3D(bestmove.pointer, "player") .. " yards to find a fight")
+            tt:SetStatusText("Moving to " .. bestmove.Name .. " at " .. dmc.GetDistance3D(bestmove.pointer, "player") .. " yards to find a fight score is " .. bestmove.score)
             tt:NavTo(bestmove.x, bestmove.y, bestmove.z)
             return
         else
@@ -121,10 +120,12 @@ function BGBot:Pulse()
     local bestmove = self:GetBestMove()
 end
 
-local spot = tt.Classes.Spot(631.87835693359, 232.57249450684, 328.83819580078, 727, 671.68951416016, 222.47822570801, 320.1237487793)
+local spot = tt.Classes.Spot(628.09710693359, 230.25869750977, 328.99182128906, 727, 675.06805419922, 222.31399536133, 319.90646362305)
 local spots = tt.Classes.Spot(1816.8699951172, 160.08299255371, 1.8064399957657, 726, 1812.6453857422, 200.64604187012, -20.939380645752)
+local spot2 = tt.Classes.Spot(1061.9154052734, 1378.19140625, 328.5080871582, 726, 1090.0329589844, 1397.9826660156, 319.44784545898)
 tinsert(tt.movespot, spot)
 tinsert(tt.movespot, spots)
+tinsert(tt.movespot, spot2)
 
 local bspot = tt.Classes.Spot(1803.0208740234, 1539.9670410156, 1249.1867675781, 566, 671.68951416016, 222.47822570801, 320.1237487793)
 tinsert(tt.badspot, bspot)
@@ -132,7 +133,7 @@ tinsert(tt.badspot, bspot)
 function BGBot:InMoveSpot()
     local x, y, z = dmc.GetUnitPosition("player")
     for k,v in pairs(tt.movespot) do
-        if dmc.GetMapID() == v.mapId and dmc.GetDistance3D(x,y,z,v.x,v.y,v.z) < 35 then
+        if dmc.GetDistance3D(x,y,z,v.x,v.y,v.z) < 35 then
             local px, py, pz = v.facex, v.facey, v.facez
             local dx, dy, dz = x-px, y-py, z-pz
             local radians = math.atan2(-dy, -dx)
@@ -188,27 +189,31 @@ function BGBot:GetBestMove()
             score = score + (enemies * HostileScore) + (friends * FriendlyScore)
 
             if (enemies * HostileScore) > ((friends * FriendlyScore) * 3.5) or (enemies < 1) or (friends <= 1) then
-                score = score - 1000
+                score = score - 1500
             end
 
+            score = score - v.Distance / 4
+
+            if not v:HasPath() then
+                print(v.Name .. " has no path")
+                score = score - 10000
+            end
+
+            if localenv["UnitAffectingCombat"](v.pointer) then
+                score = score + 500
+            end
             v.score = score
             v.EnemiesAround = enemies   
             v.FriendsAround = friends
 
-            if (v.Distance ~= nil and v.Distance > 2000) or UnitIsDeadOrGhost(v.pointer) then
-                score = 1
-            end
-            if v.Distance == nil then score = 1 end
-
-            if self:IsInSpawn(v.x,v.y,v.z) then
-                score = 1
-            end
-
-            if score ~= nil and score < 1700 and score > bestscore then
+            if score ~= nil and score > bestscore then
                 bestscore = score
                 bestmove = v
             end
         end
+    end
+    if bestmove ~= nil then
+        --print("best score is " .. bestscore .. " for " .. bestmove.Name)
     end
     return bestmove
 end
@@ -283,15 +288,13 @@ function BGBot:Debug()
     local bestmove = self:GetBestMove()
     local closest = self:ClosestTarget()
     if bestmove ~= nil then
-        local x,y,z = dmc.GetUnitPosition(bestmove.pointer)
-        local px,py,pz = dmc.GetUnitPosition("player")
-        tt.draw:Line(px, py, pz, x, y, z,true)
+        tt.draw:Line(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, bestmove.x, bestmove.y, bestmove.z)
     end
     if closest ~= nil then
         local x,y,z = dmc.GetUnitPosition(closest.pointer)
         local px,py,pz = dmc.GetUnitPosition("player")
         tt.draw:SetColor(255, 0, 0, 255)
-        tt.draw:Line(px,py,pz,x,y,z,true)
+        tt.draw:Line(px,py,pz,x,y,z)
         tt.draw:Outline(x, y, z, 5)
     end
 end

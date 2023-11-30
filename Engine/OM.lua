@@ -3,8 +3,6 @@ tt.players, tt.units, tt.gameobjects = {}, {}, {}
 local players, units, gameobjects = tt.players, tt.units, tt.gameobjects
 
 function tt:FlushOM()
-    tt.players, tt.units, tt.gameobjects = {}, {}, {}
-    players, units, gameobjects = tt.players, tt.units, tt.gameobjects
     self:UpdateOM()
 end
 
