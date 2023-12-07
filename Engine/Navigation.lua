@@ -6,14 +6,14 @@ function tt:NavTo(x,y,z)
     end
 
     local px, py, pz = dmc.GetUnitPosition("player")
-    if dmc.GetDistance3D(px, py, pz, x, y, z) > 100 and not IsMounted() and not UnitCastingInfo("player") ~= nil then
+    if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() and not UnitCastingInfo("player") ~= nil then
         local useDruidMount = (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3);
         if useDruidMount then
             tt:Cast("Travel Form")
         end
     end
     local mapId = dmc.GetMapID()
-    local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z, true )
+    local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z )
     if PathCnt == 0 then 
         return 
     end

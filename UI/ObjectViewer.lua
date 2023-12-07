@@ -59,12 +59,7 @@ function tt:AddColumn(name)
             ["a"] = 1.0 
         }, -- red backgrounds, eww!
         ["defaultsort"] = "dsc",
-        ["sortnext"]= 4,
-        ["comparesort"] = function (cella, cellb, sortbycol)
-            sortbycol = sortbycol or 3;
-            local cella, cellb = self:GetCell(rowa, sortbycol), self:GetCell(rowb, sortbycol);
-            print(cella, cellb)
-        end,    
+        ["sortnext"]= 4, 
         ["DoCellUpdate"] = nil,
     }
     table.insert(cols, column)

@@ -22,6 +22,7 @@ local lastOMUpdate = 0
 
 tt.draw = nil
 tt.scoredraw = nil
+tt.bgdraw = nil
 
 tt.combatrange = 25
 tt.pullrange = 35
@@ -78,5 +79,6 @@ tt.frame:SetScript("OnKeyDown", function(self, key)
 end)
 
 function tt:Cast(name, tar)
+    print("Casting "..name)
     localenv["CastSpellByName"](name, tar)
 end

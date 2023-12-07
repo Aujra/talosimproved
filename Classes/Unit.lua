@@ -18,75 +18,57 @@ end
 
 function Unit:Update()
     tt.Classes.GameObject.Update(self, self.pointer)
-    self.score = self:GetScore()
     self.Dead = localenv["UnitIsDead"](self.pointer)
     self.Health = localenv["UnitHealth"](self.pointer)
     self.HealthMax = localenv["UnitHealthMax"](self.pointer)
-    self.FriendsAround = tt.botbases.BGBot:FriendsAround(60)
-    self.EnemiesAround = tt.botbases.BGBot:EnemiesAround(60)
+    self.HP = self.Health / self.HealthMax * 100
     self.attackable = localenv["UnitCanAttack"]("player", self.pointer)
     self.los = self:LOS()
 end
 
-function Unit:HasPath()
-    local x,y,z = dmc.GetUnitPosition("player")
-    local mapId = dmc.GetMapID()
-    local PathCnt = dmc.FindPath(mapId, self.x, self.y, self.z, x, y, z, true )
-    if PathCnt == 0 then 
-        return false
-    else
+function Unit:IsCasting()
+    local name, _, _, _, startTime, endTime, _, _, _ = localenv["UnitCastingInfo"](self.pointer)
+    local name2, _, _, _, startTime2, endTime2, _, _, _ = localenv["UnitChannelInfo"](self.pointer)
+    if name ~= nil then
         return true
     end
-end
-
-function Unit:LOS()
-    local x,y,z = dmc.GetUnitPosition("player")
-    local x2,y2,z2 = dmc.GetUnitPosition(self.pointer)
-    local hit = dmc.TraceLine(x,y,z,x2,y2,z2, 0x10)
-    if hit == 0 then
+    if name2 ~= nil then
         return true
     end
     return false
 end
 
-function Unit:GetScore()
-    if tt.time - self.lastupdate < 5 then
-        return self.score
-    end
-    local score = 2000
-    score = score - self.Distance * 10
-    local role = GetSpecializationRole(GetSpecialization())
-    local FriendlyScore = 1
-    local HostileScore = 1
-    if role == "HEALER" then
-        FriendlyScore = 5
-        HostileScore = 2
-    else
-        HostileScore = 2
-        FriendlyScore = 4
-    end
-
-
-    score = score 
-    return score
-end
-
-function Unit:HasBuff(spell)
+function Unit:HasBuff(spell, byme)
+    byme = byme or false
     for i = 1, 40 do
-        local name, _, _, _, _, _, _, _, _, spellid = localenv["UnitBuff"](self.pointer, i)
-        if name == spell then
-            return true
+        local name, _, count, dispelType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, _, timeMod = localenv["UnitAura"](self.pointer, i, "HELPFUL")
+        if byme then
+            if unitCaster == "player" and name == spell then
+                return true
+            end
+        else
+            if name == spell then
+                return true
+            end
         end
     end
+    return false
 end
 
-function Unit:HasDebuff(spell)
+function Unit:HasDebuff(spell, byme)
     for i = 1, 40 do
-        local name, _, _, _, _, _, _, _, _, spellid = localenv["UnitDebuff"](self.pointer, i)
-        if name == spell then
-            return true
+        local name, _, count, dispelType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, _, timeMod = localenv["UnitAura"](self.pointer, i, "HARMFUL")
+        if byme then
+            if unitCaster == "player" and name == spell then
+                return true
+            end
+        else
+            if name == spell then
+                return true
+            end
         end
     end
+    return false
 end
 
 function Unit:TargetingMe()

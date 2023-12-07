@@ -9,8 +9,7 @@ end
 
 function RotationBot:Pulse()
     if localenv["UnitAffectingCombat"]("player") then
-        print("Pulsing")
-        tt.rotations[tt.rotation]:Pulse()
+        tt.rotations[tt.rotation]:Pulse(dmc.UnitTarget("player"))
     end
 end
 
