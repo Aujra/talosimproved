@@ -10,12 +10,6 @@ local botBaseIndex = 1
 local botBaseNames = {}
 local rotationIndex = 1
 local rotationNames = {}
-for k,v in pairs(tt.botbases) do
-    table.insert(botBaseNames, k)
-end
-for k,v in pairs(tt.rotations) do
-    table.insert(rotationNames, k)
-end
 
 function HUD:CreateHUDFrame(name, width, offset, rel, heightoff)
     print("CreateHUDFrame", name, width, offset, rel, heightoff)
@@ -30,15 +24,15 @@ function HUD:CreateHUDFrame(name, width, offset, rel, heightoff)
 end
 
 HUDFrame = CreateFrame("Frame", nil, UIParent)
-HUDFrame:SetWidth(UIParent:GetWidth()/2)
+HUDFrame:SetWidth(UIParent:GetWidth())
 HUDFrame:SetHeight(20)
 HUDFrame:SetPoint("TOP", UIParent, "TOP", 0, 0)
 
 HUDFrame.tex = HUDFrame:CreateTexture()
 HUDFrame.tex:SetAllPoints(HUDFrame)
-HUDFrame.tex:SetColorTexture(0, 0, 0, 0.9)
+HUDFrame.tex:SetColorTexture(0, 0, 0, 0.4)
 
-HUDFrame.Running = HUD:CreateHUDFrame("Running", 50, 400, "LEFT")
+HUDFrame.Running = HUD:CreateHUDFrame("Running", 50, 500, "LEFT")
 if tt.running then
     HUDFrame.Running:SetText(green.."Running")
 else
@@ -54,7 +48,16 @@ HUDFrame.Running:SetScript("OnClick", function(self, button, down)
     end
 end)
 
-HUDFrame.Botbase = HUD:CreateHUDFrame("Botbase", 50, 50, "LEFT")
+for k,v in pairs(tt.botbases) do
+    table.insert(botBaseNames, k)
+end
+for k,v in pairs(tt.rotations) do
+    if string.lower(v.class) == string.lower(UnitClass("player")) or v.class == "all" then
+        table.insert(rotationNames, k)
+    end
+end
+
+HUDFrame.Botbase = HUD:CreateHUDFrame("Botbase", 50, 100, "LEFT")
 HUDFrame.Botbase:SetText(white..botBaseNames[botBaseIndex])
 HUDFrame.Botbase:SetScript("OnClick", function()
     botBaseIndex = botBaseIndex + 1
@@ -78,15 +81,15 @@ HUDFrame.Rotation:SetScript("OnClick", function()
 end)
 HUDFrame.Botbase:Show()
 
-HUDFrame.ToggleObjectViewer = HUD:CreateHUDFrame("ObjectManager", 150, 800, "LEFT")
-HUDFrame.ToggleObjectViewer:SetText("Toggle ObjectManager")
+HUDFrame.ToggleObjectViewer = HUD:CreateHUDFrame("ObjectManager", 150, 300, "LEFT")
+HUDFrame.ToggleObjectViewer:SetText("Toggle OM")
 HUDFrame.ToggleObjectViewer:SetScript("OnClick", function()
     tt:ToggleObjectViewer()
 end)
 HUDFrame.ToggleObjectViewer:Show()
 
-HUDFrame.ToggleDebug = HUD:CreateHUDFrame("ToggleDebug", 150, 600, "LEFT")
-HUDFrame.ToggleDebug:SetText("Toggle Debugging")
+HUDFrame.ToggleDebug = HUD:CreateHUDFrame("ToggleDebug", 150, 400, "LEFT")
+HUDFrame.ToggleDebug:SetText("Toggle Debug")
 HUDFrame.ToggleDebug:SetScript("OnClick", function()
     if tt.doDebugging then
         tt.doDebugging = false
@@ -95,30 +98,10 @@ HUDFrame.ToggleDebug:SetScript("OnClick", function()
     end
     print("Debugging is now", tt.doDebugging)
 end)
-HUDFrame.ToggleDebug:Show()
 
-HUDFrame.MoveSpot = HUD:CreateHUDFrame("MoveSpot", 150, -150, "CENTER", -100)
-HUDFrame.MoveSpot:SetText("Mark Move Spot")
-HUDFrame.MoveSpot:SetScript("OnClick", function()
-    local x, y, z = dmc.GetUnitPosition("player")
-    tt.movespot[x] = tt.Classes.Spot(x,y,z,dmc.GetMapID())
-end)
-HUDFrame.MoveSpot:Show()
 
-HUDFrame.BadSpot = HUD:CreateHUDFrame("BadSpot", 150, -50, "CENTER", -100)
-HUDFrame.BadSpot:SetText("Mark Bad Spot")
-HUDFrame.BadSpot:SetScript("OnClick", function()
-    print(dmc.GetMapID())
-    print(dmc.GetUnitPosition("player"))
-end)
-HUDFrame.BadSpot:Show()
-
-HUDFrame.ShowSpots = HUD:CreateHUDFrame("ShowSpots", 150, 50, "CENTER", -100)
-HUDFrame.ShowSpots:SetText("Show Spots")
-HUDFrame.ShowSpots:SetScript("OnClick", function()
-    
-end)
-HUDFrame.ShowSpots:Show()
+HUDFrame.StatusBarText = HUD:CreateHUDFrame("StatusText", 50, 600, "LEFT")
+HUDFrame.StatusBarText:SetText("|c0000ff00Current Status")
 
 function HUDFrame:Update()
     HUDFrame.Botbase:SetText(white..botBaseNames[botBaseIndex])
@@ -132,4 +115,8 @@ end
 
 function tt:UpdateHUD()
     HUDFrame:Update()
+end
+
+function tt:SetStatusText(text)
+    HUDFrame.StatusBarText:SetText("|c0000ff00 Status: "..text)
 end

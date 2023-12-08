@@ -1,26 +1,25 @@
 local tt = tt
-tt.rotations.Mage = class()
-local Mage = tt.rotations.Mage
+tt.rotations.Monk = class()
+local Monk = tt.rotations.Monk
 
-Mage.name = "Mage"
-Mage.class = "mage"
+Monk.name = "Monk"
+Monk.class = "Monk"
 
-function Mage:init()
+function Monk:init()
 end
 
-function Mage:SetRange()
-    tt.combatrange = 35
-    tt.pullrange = 35
+function Monk::SetRange()
+    tt.combatrange = 5
+    tt.pullrange = 25
 end
 
-function Mage:Pull()
+function Monk:Pull()
     if localenv["UnitAffectingCombat"]("player") then
         return self:Pulse()
     end
-    tt:Cast("Fireball", tar)
 end
 
-function Mage:Pulse(target)
+function Monk:Pulse(target)
     local spec = GetSpecialization()
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then 
         return 
@@ -44,30 +43,37 @@ function Mage:Pulse(target)
         end
 
         if spec == 1 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
+            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end   
-            if not tt.LocalPlayer:HasBuff("Arcane Power") then
-                tt:Cast("Arcane Power", "player")
+            if not tt.LocalPlayer:HasBuff("Ironskin Brew") then
+                tt:Cast("Ironskin Brew", "player")
             end
-            if not tt.LocalPlayer:HasBuff("Rune of Power") then
-                tt:Cast("Rune of Power", "player")
+            if not tt.LocalPlayer:HasBuff("Stagger") then
+                tt:Cast("Stagger", "player")
             end
-            if not tt.LocalPlayer:HasBuff("Arcane Familiar") then
-                tt:Cast("Arcane Familiar", "player")
+            if not tt.LocalPlayer:HasBuff("Fortifying Brew") then
+                tt:Cast("Fortifying Brew", "player")
             end
-            if not tt.LocalPlayer:HasBuff("Arcane Intellect") then
-                tt:Cast("Arcane Intellect", "player")
+            if not tt.LocalPlayer:HasBuff("Keg Smash") then
+                tt:Cast("Keg Smash", target.pointer)
             end
-            if tt.LocalPlayer:HasBuff("Clearcasting") then
-                tt:Cast("Arcane Missiles", target.pointer)
+            if not tt.LocalPlayer:HasBuff("Breath of Fire") then
+                tt:Cast("Breath of Fire", target.pointer)
             end
-            if tt.LocalPlayer.arcane ~= nil and tt.LocalPlayer.arcane < 4 then
-                tt:Cast("Arcane Blast", target.pointer)
+            if not tt.LocalPlayer:HasBuff("Blackout Strike") then
+                tt:Cast("Blackout Strike", target.pointer)
             end
-            if tt.LocalPlayer.arcane == 4 then
-                tt:Cast("Arcane Barrage", target.pointer)
+            if not tt.LocalPlayer:HasBuff("Tiger Palm") then
+                tt:Cast("Tiger Palm", target.pointer)
             end
+            if not tt.LocalPlayer:HasBuff("Rushing Jade Wind") then
+                tt:Cast("Rushing Jade Wind", "player")
+            end
+            if not tt.LocalPlayer:HasBuff("Black Ox Brew") then
+                tt:Cast("Black Ox Brew", "player")
+            end
+            tt:Cast("Rising Sun Kick", target.pointer)
         end
 
         if spec == 3 then
@@ -113,4 +119,4 @@ function Mage:Pulse(target)
     end
 end
 
-tt:RegisterRotation(Mage.name, Mage)
+tt:RegisterRotation(Monk.name, Monk)

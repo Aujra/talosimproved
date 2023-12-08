@@ -3,11 +3,26 @@ tt.rotations.Druid = class()
 local Druid = tt.rotations.Druid
 
 Druid.name = "Druid"
+Druid.class = "druid"
 
 function Druid:init()
 end
 
 function Druid:Pull()
+end
+
+function Druid:SetRange()
+    tt.combatrange = 5
+    tt.pullrange = 25
+    
+    if GetSpecialization() == 1 then
+        tt.combatrange = 35
+        tt.pullrange = 35
+    end
+    if GetSpecialization() == 4 then
+        tt.combatrange = 35
+        tt.pullrange = 35
+    end
 end
 
 function Druid:Pulse(target)
@@ -24,7 +39,7 @@ function Druid:Pulse(target)
 
         if spec == 1 then
             
-            if target.Distance > 35 then
+            if target.Distance > 35 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.PosX, target.PosY, target.PosZ)
             end
 
@@ -47,9 +62,6 @@ function Druid:Pulse(target)
             local sunfirecount = tt.CombatHelpers:GetDebuffCount("Sunfire")
             local closest_no_moonfire = tt.CombatHelpers:ClosestWithoutDebuff("Moonfire")
 
-            if moonfirecount <= 1 and closest_no_moonfire ~= nil then
-                tt:Cast("Moonfire", closest_no_moonfire.pointer)
-            end
 
             tt:Cast("Celestial Alignment", "player")
             tt:Cast("Convoke the Spirits", target.pointer)
@@ -60,13 +72,22 @@ function Druid:Pulse(target)
             tt:Cast("wrath", target.pointer)
         end
         if spec == 2 then
-            if target.Distance > 5 then
+            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end            
 
             if GetShapeshiftForm() ~= 2 then
                 tt:Cast("Cat Form", "player")
             end
+
+            if not localenv["UnitAffectingCombat"]("player") and not tt.LocalPlayer:HasBuff("Prowl") then
+                tt:Cast("Prowl", "player")
+            end
+
+            if tt.LocalPlayer:HasBuff("Predatory Swiftness") then
+                tt:Cast("Regrowth", "player")
+            end
+
             tt:Cast("Wild Charge", target.pointer)
             if tt.LocalPlayer.power < 40 then
                 tt:Cast("Tiger's Fury", "player")

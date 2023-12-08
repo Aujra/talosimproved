@@ -18,7 +18,11 @@ function tt:UpdateOM()
     if #added > 0 then
         for _, v in pairs(added) do 
             if dmc.ObjectType(v) == 7 then
-                tt.LocalPlayer = tt.Classes.LocalPlayer(v)
+                if tt.LocalPlayer == nil then
+                    tt.LocalPlayer = tt.Classes.LocalPlayer(v)
+                else
+                    tt.LocalPlayer:Update(v)
+                end
             end
             if dmc.ObjectType(v) == 8 then
                 if tt.gameobjects[v] then

@@ -3,9 +3,10 @@ tt.botbases.BGBot = class()
 local BGBot = tt.botbases.BGBot
 
 BGBot.name = "BGBot"
+BGBot.allowMovement = true
 
 function BGBot:init()
-    print("INIT BGBot")
+    self.allowMovement = true
 end
 
 local acceptedtime = 0

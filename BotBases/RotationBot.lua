@@ -3,6 +3,7 @@ tt.botbases.RotationBot = class()
 local RotationBot = tt.botbases.RotationBot
 
 RotationBot.name = "RotationBot"
+RotationBot.allowMovement = false
 
 function RotationBot:init()
 end

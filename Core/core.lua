@@ -15,6 +15,8 @@ tt.LocalPlayer = nil
 
 tt.time = GetTime()
 
+tt.mountID = nil
+
 tt.running = false
 tt.doDebugging = true
 
@@ -44,6 +46,17 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
     if not tt.running then return end
     tt.time = tt.time + elapsed
     if tt.time > lastOMUpdate + .1 then
+
+        if tt.mountID == nil then
+            for i = 1, C_MountJournal.GetNumMounts(), 1 do
+                local creatureName, spellID, icon, active, isUsable, sourceType, isFavorite, isFactionSpecific, faction, hideOnChar, isCollected = C_MountJournal.GetMountInfoByID(i)
+                if isUsable and isCollected then
+                    tt.mountID = i
+                    break
+                end
+            end
+        end
+
         tt.scoredraw:ClearCanvas()
         lastOMUpdate = tt.time
         tt:UpdateOM()
@@ -56,6 +69,7 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
                 tt.draw:ClearCanvas()
                 tt.scoredraw:ClearCanvas()
             end
+            tt.rotations[tt.rotation]:SetRange()
             tt.botbases[tt.botbase]:Pulse()
         end
     end

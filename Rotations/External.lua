@@ -3,6 +3,7 @@ tt.rotations.External = class()
 local External = tt.rotations.External
 
 External.name = "External"
+External.class = "all"
 
 function External:init()
 end

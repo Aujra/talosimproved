@@ -159,5 +159,5 @@ if not OMFrame then
         print("tt.combatrange", tt.combatrange)
     end)
     OMFrame:AddChild(combatrange)
-
+    OMFrame:Hide()
 end

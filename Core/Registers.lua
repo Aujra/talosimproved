@@ -1,12 +1,10 @@
 local tt = tt
 
 function tt:RegisterBotBase(name, base)
-    print("RegisterBotBase", name, base)
     tt.botbases[name] = base
 end
 
 function tt:RegisterRotation(name, rotation)
-    print("RegisterRotation", name, rotation)
     tt.rotations[name] = rotation
 end
 
@@ -19,7 +17,7 @@ function tt:getBotBaseIndex(name)
         i = i + 1
     end
 end
-function tt:getRotationInde(name)
+function tt:getRotationIndex(name)
     local i = 1
     for k,v in pairs(tt.rotations) do
         if k == name then

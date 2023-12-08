@@ -2,6 +2,7 @@ local tt = tt
 
 function tt:NavTo(x,y,z)
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then
+        localenv["MoveForwardStop"]()
         return
     end
 
@@ -10,7 +11,13 @@ function tt:NavTo(x,y,z)
         local useDruidMount = (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3);
         if useDruidMount then
             tt:Cast("Travel Form")
-        end
+        else
+            if tt.mountID ~= nil then
+                localenv["MoveForwardStop"]()
+                C_MountJournal.SummonByID(tt.mountID)
+                return
+            end
+        end 
     end
     local mapId = dmc.GetMapID()
     local PathCnt = dmc.FindPath(mapId, px, py, pz, x, y, z )
