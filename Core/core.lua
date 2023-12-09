@@ -52,6 +52,10 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
         tt:UpdateOM()
         tt:updateObjectViewer()
 
+        local missileCount = dmc.GetMissileCount()
+        draw:ClearCanvas()
+        draw:SetColor(0, 255, 0, 255)
+
         if tt.botbase then
             if tt.doDebugging then
                 tt.botbases[tt.botbase]:Debug()
