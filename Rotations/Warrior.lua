@@ -67,6 +67,12 @@ function Warrior:Pulse(target)
             else
                 --localenv["MoveForwardStop"]()
             end
+
+            local caster = tt.CombatHelpers:GetClosestCaster(5)
+            if caster ~= nil then
+                tt:Cast("Pummel", caster.pointer)
+            end
+
             tt:Cast("Charge", target.pointer)
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
