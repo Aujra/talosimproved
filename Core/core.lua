@@ -1,12 +1,3 @@
-local lastmessage
-local oldprint = print
-print = function(...)
-    if lastmessage ~= ... then
-        lastmessage = ...
-        oldprint(...);
-    end
-end
-
 tt = {}
 tt.rotations = {}
 tt.botbases = {}
@@ -33,7 +24,6 @@ setfenv(1, localenv)
 
 tt.AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 tt.chatcom = LibStub("AceAddon-3.0"):NewAddon("tt", "AceConsole-3.0")
-
 
 tt.frame = CreateFrame("Frame", "bro", UIParent)
 tt.frame:SetScript("OnUpdate", function(self, elapsed)
@@ -95,4 +85,12 @@ end)
 function tt:Cast(name, tar)
     print("Casting "..name)
     localenv["CastSpellByName"](name, tar)
+end
+
+function tt:MakeTabs(container, title, tabs)
+    local tabgroup = tt.AceGUI:Create("TabGroup")
+    tabgroup:SetLayout("Flow")
+    tabgroup:SetTabs(tabs)
+    tabgroup:SetTitle(title)
+    container:AddChild(tabgroup)
 end

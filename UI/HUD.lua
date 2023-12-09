@@ -32,7 +32,7 @@ HUDFrame.tex = HUDFrame:CreateTexture()
 HUDFrame.tex:SetAllPoints(HUDFrame)
 HUDFrame.tex:SetColorTexture(0, 0, 0, 0.4)
 
-HUDFrame.Running = HUD:CreateHUDFrame("Running", 50, 500, "LEFT")
+HUDFrame.Running = HUD:CreateHUDFrame("Running", 50, 550, "LEFT")
 if tt.running then
     HUDFrame.Running:SetText(green.."Running")
 else
@@ -81,14 +81,22 @@ HUDFrame.Rotation:SetScript("OnClick", function()
 end)
 HUDFrame.Botbase:Show()
 
-HUDFrame.ToggleObjectViewer = HUD:CreateHUDFrame("ObjectManager", 150, 300, "LEFT")
+HUDFrame.RotationConfig = HUD:CreateHUDFrame("Rotation", 50, 250, "LEFT")
+HUDFrame.RotationConfig:SetText(white.."Config")
+HUDFrame.RotationConfig:SetScript("OnClick", function()
+    tt.rotations[tt.rotation]:OpenConfig()
+    HUDFrame:Update()
+end)
+HUDFrame.Botbase:Show()
+
+HUDFrame.ToggleObjectViewer = HUD:CreateHUDFrame("ObjectManager", 150, 350, "LEFT")
 HUDFrame.ToggleObjectViewer:SetText("Toggle OM")
 HUDFrame.ToggleObjectViewer:SetScript("OnClick", function()
     tt:ToggleObjectViewer()
 end)
 HUDFrame.ToggleObjectViewer:Show()
 
-HUDFrame.ToggleDebug = HUD:CreateHUDFrame("ToggleDebug", 150, 400, "LEFT")
+HUDFrame.ToggleDebug = HUD:CreateHUDFrame("ToggleDebug", 150, 450, "LEFT")
 HUDFrame.ToggleDebug:SetText("Toggle Debug")
 HUDFrame.ToggleDebug:SetScript("OnClick", function()
     if tt.doDebugging then
@@ -100,7 +108,7 @@ HUDFrame.ToggleDebug:SetScript("OnClick", function()
 end)
 
 
-HUDFrame.StatusBarText = HUD:CreateHUDFrame("StatusText", 50, 600, "LEFT")
+HUDFrame.StatusBarText = HUD:CreateHUDFrame("StatusText", 50, 0, "CENTER")
 HUDFrame.StatusBarText:SetText("|c0000ff00Current Status")
 
 function HUDFrame:Update()
@@ -118,5 +126,5 @@ function tt:UpdateHUD()
 end
 
 function tt:SetStatusText(text)
-    HUDFrame.StatusBarText:SetText("|c0000ff00 Status: "..text)
+    HUDFrame.StatusBarText:SetText("|c0000ff00 ("..tt.combatrange.."/"..tt.pullrange..") Status: "..text)
 end

@@ -5,6 +5,8 @@ local Druid = tt.rotations.Druid
 Druid.name = "Druid"
 Druid.class = "druid"
 
+local druidFrame
+
 function Druid:init()
 end
 
@@ -39,7 +41,7 @@ function Druid:Pulse(target)
 
         if spec == 1 then
             
-            if target.Distance > 35 and tt.botbases[tt.botbase].allowMovement then
+            if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.PosX, target.PosY, target.PosZ)
             end
 
@@ -72,7 +74,7 @@ function Druid:Pulse(target)
             tt:Cast("wrath", target.pointer)
         end
         if spec == 2 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
+            if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end            
 
@@ -145,6 +147,28 @@ end
 
 function Druid:PVPTarget()
 
+end
+
+function Druid:BuildConfig()
+    if druidFrame == nil then
+        druidFrame = tt.AceGUI:Create("Frame")
+        druidFrame:SetTitle("Druid Config")
+        druidFrame:SetStatusText("Druid Config")
+        druidFrame:SetWidth(800)
+        druidFrame:SetHeight(800)
+
+        local tabgroup = tt:MakeTabs(druidFrame, "Druid Config", {{value = "Resto", text = "Resto"}, {value = "Feral", text = "Feral"}, {value = "Balance", text = "Balance"},
+            {value = "Guardian", text = "Guardian"}})
+
+    end
+end
+
+function Druid:OpenConfig()
+    if druidFrame == nil then
+        Druid:BuildConfig()
+    end
+    print("Opening Druid Config")
+    druidFrame:Show()
 end
 
 tt:RegisterRotation(Druid.name, Druid)

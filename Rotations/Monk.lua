@@ -8,7 +8,7 @@ Monk.class = "Monk"
 function Monk:init()
 end
 
-function Monk::SetRange()
+function Monk:SetRange()
     tt.combatrange = 5
     tt.pullrange = 25
 end

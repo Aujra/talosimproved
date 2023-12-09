@@ -12,15 +12,26 @@ if not frame then
     frame:SetHeight(500)
     frame:EnableResize(false)
 
-    local editbox = tt.AceGUI:Create("MultiLineEditBox")
-    editbox:SetLabel("Log")
-    editbox:SetFullWidth(true)
-    editbox:SetFullHeight(true)
-    editbox:SetDisabled(false)
-    frame:AddChild(editbox)
+    frame.editbox = tt.AceGUI:Create("MultiLineEditBox")
+    frame.editbox:SetLabel("Log")
+    frame.editbox:SetFullWidth(true)
+    frame.editbox:SetFullHeight(true)
+    frame.editbox:SetDisabled(false)
+    frame:AddChild(frame.editbox)
 end
 
 function log:Add(message)
-    local current = frame.children[1]:GetText()
-    frame.children[1]:SetText(current .. "\n" .. message)
+    local current = frame.editbox:GetText()
+    frame.editbox:SetText(current .. "\n" .. message)
+end
+
+local lastmessage
+local oldprint = print
+
+print = function(...)
+    if lastmessage ~= ... then
+        lastmessage = ...
+        oldprint(...)
+        tt.Log:Add(...)
+    end
 end
