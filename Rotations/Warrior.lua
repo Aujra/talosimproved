@@ -65,7 +65,7 @@ function Warrior:Pulse(target)
             if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             else
-                localenv["MoveForwardStop"]()
+                --localenv["MoveForwardStop"]()
             end
             tt:Cast("Charge", target.pointer)
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
