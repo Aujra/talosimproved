@@ -126,5 +126,5 @@ function tt:UpdateHUD()
 end
 
 function tt:SetStatusText(text)
-    HUDFrame.StatusBarText:SetText("|c0000ff00 ("..tt.combatrange.."/"..tt.pullrange..") Status: "..text)
+    HUDFrame.StatusBarText:SetText("|c0000ff00 ("..tt.combatrange.."/"..tt.pullrange.." 1.1) Status: "..text)
 end
