@@ -1,13 +1,14 @@
 local tt = tt
 
-function tt:NavTo(x,y,z)
+function tt:NavTo(x,y,z, closeenough)
+    closeenough = closeenough or false
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then
         localenv["MoveForwardStop"]()
         return
     end
 
     local px, py, pz = dmc.GetUnitPosition("player")
-    if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() and not UnitCastingInfo("player") ~= nil then
+    if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() and not UnitCastingInfo("player") ~= nil and not IsIndoors() then
         local useDruidMount = (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3);
         if useDruidMount then
             tt:Cast("Travel Form")

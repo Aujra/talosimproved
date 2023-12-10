@@ -20,6 +20,9 @@ tt.bgdraw = nil
 tt.combatrange = 25
 tt.pullrange = 35
 
+local afkrest = 0
+local inited = false
+
 setfenv(1, localenv)
 
 tt.AceGUI = LibStub and LibStub("AceGUI-3.0", true)
@@ -27,6 +30,13 @@ tt.chatcom = LibStub("AceAddon-3.0"):NewAddon("tt", "AceConsole-3.0")
 
 tt.frame = CreateFrame("Frame", "bro", UIParent)
 tt.frame:SetScript("OnUpdate", function(self, elapsed)
+    if not inited then
+        tt:Init()
+    end
+    if GetTime() - afkrest > 30 then
+        afkrest = GetTime()
+        dmc.ResetAfk()
+    end
     if tt.draw == nil then
         tt.draw = Draw:New()
     end
@@ -51,19 +61,28 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
         lastOMUpdate = tt.time
         tt:UpdateOM()
         tt:updateObjectViewer()
-
-        if tt.botbase then
-            if tt.doDebugging then
-                tt.botbases[tt.botbase]:Debug()
-            else
-                tt.draw:ClearCanvas()
-                tt.scoredraw:ClearCanvas()
-            end
-            tt.rotations[tt.rotation]:SetRange()
-            tt.botbases[tt.botbase]:Pulse()
+    end
+    if tt.botbase then
+        if tt.doDebugging then
+            tt.botbases[tt.botbase]:Debug()
+        else
+            tt.draw:ClearCanvas()
+            tt.scoredraw:ClearCanvas()
         end
+        tt.rotations[tt.rotation]:SetRange()
+        tt.botbases[tt.botbase]:Pulse()
     end
 end)
+
+function tt:Init()
+    if dmc then
+        tt.Log:Add(tt.version)
+        for k,v in pairs(tt.changelog) do
+        tt.Log:Add("-"..v)
+end
+        inited = true
+    end
+end
 
 function tt:tcount(t)
     local c = 0
@@ -83,8 +102,16 @@ tt.frame:SetScript("OnKeyDown", function(self, key)
 end)
 
 function tt:Cast(name, tar)
-    print("Casting "..name)
-    localenv["CastSpellByName"](name, tar)
+    local inrange = IsSpellInRange(name, tar.pointer)
+    local usable = IsUsableSpell(name)
+    local start, duration = GetSpellCooldown(name)
+
+    if inrange == 1 and usable and start == 0 then
+        print("Casting "..name)
+        localenv["CastSpellByName"](name, tar)
+        return true
+    end
+    return false
 end
 
 function tt:MakeTabs(container, title, tabs)

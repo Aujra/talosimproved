@@ -12,7 +12,6 @@ local rotationIndex = 1
 local rotationNames = {}
 
 function HUD:CreateHUDFrame(name, width, offset, rel, heightoff)
-    print("CreateHUDFrame", name, width, offset, rel, heightoff)
     heightoff = heightoff and heightoff or 10
     local f = CreateFrame("Button", name, HUDFrame)
     f:SetNormalFontObject(GameFontNormalSmall)
@@ -126,5 +125,5 @@ function tt:UpdateHUD()
 end
 
 function tt:SetStatusText(text)
-    HUDFrame.StatusBarText:SetText("|c0000ff00 ("..tt.combatrange.."/"..tt.pullrange.." 1.1) Status: "..text)
+    HUDFrame.StatusBarText:SetText("|c0000ff00 Status: "..text)
 end

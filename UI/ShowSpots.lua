@@ -26,4 +26,4 @@ if not spotsframe then
     spotsframe:AddChild(movespots)
 
 end
-spotsframe:Show()
+spotsframe:Hide()

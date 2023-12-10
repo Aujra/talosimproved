@@ -13,3 +13,7 @@ end
 
 function LocalPlayer:Debug()
 end
+
+function LocalPlayer:HasItem(name)
+    
+end

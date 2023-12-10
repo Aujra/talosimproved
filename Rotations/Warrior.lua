@@ -8,6 +8,8 @@ Warrior.class = "Warrior"
 function Warrior:init()
 end
 
+local lastmove = 0
+
 function Warrior:SetRange()
     tt.combatrange = 5
     tt.pullrange = 25
@@ -43,8 +45,9 @@ function Warrior:Pulse(target)
         end
 
         if spec == 2 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
+            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement and GetTime() then
+                tt:NavTo(target.x, target.y, target.z, true)
+                lastmove = GetTime()
             end
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
@@ -62,7 +65,7 @@ function Warrior:Pulse(target)
         end
 
         if spec == 1 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
+            if target.Distance > 3 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             else
                 --localenv["MoveForwardStop"]()
@@ -80,10 +83,10 @@ function Warrior:Pulse(target)
             if not tt.LocalPlayer:HasBuff("Enrage") then
                 tt:Cast("Enrage", "player")
             end
-            tt:Cast("Warbreaker", target.pointer)
-            tt:Cast("Execute", target.pointer)
-            tt:Cast("Overpower", target.pointer)
-            tt:Cast("Mortal Strike", target.pointer)
+            if tt:Cast("Warbreaker", target.pointer) then return end
+            if tt:Cast("Execute", target.pointer) then return end
+            if tt:Cast("Overpower", target.pointer) then return end
+            if tt:Cast("Mortal Strike", target.pointer) then return end
         end
 
         if spec == 2 then

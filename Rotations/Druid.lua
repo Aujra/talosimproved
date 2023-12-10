@@ -6,6 +6,7 @@ Druid.name = "Druid"
 Druid.class = "druid"
 
 local druidFrame
+local lastMove = 0
 
 function Druid:init()
 end
@@ -40,9 +41,14 @@ function Druid:Pulse(target)
         local tarob = tt:GetObjectByGUID(target)
 
         if spec == 1 then
-            
             if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.PosX, target.PosY, target.PosZ)
+            else
+                if GetTime() - lastMove > .5 then
+                    localevn["MoveForwardStop"]()
+                    lastMove = GetTime()
+                    return
+                end
             end
 
             local caster = tt.CombatHelpers:GetClosestCaster(40)
@@ -76,7 +82,12 @@ function Druid:Pulse(target)
         if spec == 2 then
             if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
-            end            
+            end
+            
+            if target.Distance < (tt.combatrange/2) and GetTime() - lastMove > .5 then
+                localenv["MoveForwardStop"]()
+                lastMove = GetTime()
+            end
 
             if GetShapeshiftForm() ~= 2 then
                 tt:Cast("Cat Form", "player")
@@ -156,6 +167,7 @@ function Druid:BuildConfig()
         druidFrame:SetStatusText("Druid Config")
         druidFrame:SetWidth(800)
         druidFrame:SetHeight(800)
+        druidFrame:SetLayout("Flow")
 
         local tabgroup = tt:MakeTabs(druidFrame, "Druid Config", {{value = "Resto", text = "Resto"}, {value = "Feral", text = "Feral"}, {value = "Balance", text = "Balance"},
             {value = "Guardian", text = "Guardian"}})

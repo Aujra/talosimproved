@@ -152,7 +152,9 @@ function BGBot:Pulse()
 
         if bestmove ~= nil then
             if bestmove.Distance < tt.pullrange then
-                localenv["MoveForwardStop"]()
+                if bestmove.Distance < (tt.pullrange - 5) then
+                    localenv["MoveForwardStop"]()
+                end
                 if role == "HEALER" then
                     local x, y, z = dmc.GetUnitPosition("player")
                     local px, py, pz = dmc.GetUnitPosition(bestmove.pointer)
