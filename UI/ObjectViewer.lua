@@ -69,7 +69,7 @@ function tt:updateObjectViewer()
     local data = {}
     if ObjectViewer.mode == "objects" then
         for k,v in pairs(tt.gameobjects) do
-            local tree = {"", v.Name, string.format("%0d",v.Distance), 0, 0, 0, 0, string.format("%02d",v.HP)}
+            local tree = {"", v.Name, string.format("%0d",v.Distance), 0, 0, 0, 0, string.format("%02d",v.HP), v.radius}
             table.insert(data, tree)
         end
     end
@@ -84,7 +84,7 @@ function tt:updateObjectViewer()
             else
                 react = "Friendly"
             end
-            local tree = {react,v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), string.format("%0d", v.targetScore), string.format("%02d",v.HP)}
+            local tree = {react,v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), string.format("%0d", v.targetScore), string.format("%02d",v.HP), v.radius}
             table.insert(data, tree)
         end
     end
@@ -133,6 +133,7 @@ if not OMFrame then
     tt:AddColumn("Score")
     tt:AddColumn("TargetScore")
     tt:AddColumn("HP")
+    tt:AddColumn("Radius")
 
     if ScrollTable == nil then
         ScrollTable = ScrollingTable:CreateST(cols, nil, nil, nil, OMFrame.frame);

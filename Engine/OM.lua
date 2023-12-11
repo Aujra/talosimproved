@@ -1,5 +1,5 @@
 local tt = tt
-tt.players, tt.units, tt.gameobjects = {}, {}, {}
+tt.players, tt.units, tt.gameobjects, tt.areatriggers = {}, {}, {}, {}
 local players, units, gameobjects = tt.players, tt.units, tt.gameobjects
 
 function tt:FlushOM()
@@ -17,6 +17,13 @@ function tt:UpdateOM()
 
     if #added > 0 then
         for _, v in pairs(added) do 
+            if dmc.ObjectType(v) == 11 then
+                if tt.areatriggers[v] then
+                    tt.areatriggers[v]:Update(v)
+                else
+                    tt.areatriggers[v] = tt.Classes.AreaTrigger(v)
+                end
+            end
             if dmc.ObjectType(v) == 7 then
                 if tt.LocalPlayer == nil then
                     tt.LocalPlayer = tt.Classes.LocalPlayer(v)
@@ -69,7 +76,10 @@ function tt:GetObjectByGUID(guid)
 end
 
 function tt:ClearOldObjects()
-    for k,v in pairs(tt.gameobjects) do
+    for k,v in pairs(tt.areatriggers) do
+        if not dmc.ObjectExists(v.pointer) then
+            tt.areatriggers[k] = nil
+        end
         if not dmc.ObjectExists(v.pointer) then
             tt.gameobjects[k] = nil
         end

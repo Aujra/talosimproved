@@ -9,12 +9,14 @@ function GameObject:init(point)
     self.x, self.y, self.z = dmc.GetUnitPosition(point)
     self.Distance = dmc.GetDistance3D(x, y, z, self.x, self.y, self.z)
     self.score = 0
+    self.radius = dmc.UnitBoundingRadius(point)
 end
 
 function GameObject:Update(point)
     local x,y,z = dmc.GetUnitPosition("player")
     self.x, self.y, self.z = dmc.GetUnitPosition(self.pointer)
     self.Distance = dmc.GetDistance3D(x, y, z, self.x, self.y, self.z)
+    self.radius = dmc.ObjectField(self.pointer, 0xD7A4, 10)
 end
 
 function GameObject:HasPath()

@@ -33,6 +33,7 @@ Core\Registers.lua
 Engine\OM.lua
 Engine\Navigation.lua
 
+Classes\AreaTrigger.lua
 Classes\GameObject.lua
 Classes\Unit.lua
 Classes\Player.lua

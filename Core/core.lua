@@ -102,9 +102,12 @@ tt.frame:SetScript("OnKeyDown", function(self, key)
 end)
 
 function tt:Cast(name, tar)
+    if tar == nil then return false end
     local inrange = IsSpellInRange(name, tar.pointer)
     local usable = IsUsableSpell(name)
     local start, duration = GetSpellCooldown(name)
+
+    if inrange == nil then inrange = 1 end
 
     if inrange == 1 and usable and start == 0 then
         print("Casting "..name)

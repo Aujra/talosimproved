@@ -1,5 +1,7 @@
 local tt = tt
 
+local lastmount = 0
+
 function tt:NavTo(x,y,z, closeenough)
     closeenough = closeenough or false
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then
@@ -8,14 +10,18 @@ function tt:NavTo(x,y,z, closeenough)
     end
 
     local px, py, pz = dmc.GetUnitPosition("player")
-    if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() and not UnitCastingInfo("player") ~= nil and not IsIndoors() then
+    if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() and GetTime() - lastmount > 5
+       and not localenv["UnitAffectingCombat"]("player") and (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3) and not UnitCastingInfo("player") ~= nil and not IsIndoors() then
         local useDruidMount = (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3);
         if useDruidMount then
             tt:Cast("Travel Form")
+            lastmount = GetTime()
+            return
         else
             if tt.mountID ~= nil then
                 localenv["MoveForwardStop"]()
                 C_MountJournal.SummonByID(tt.mountID)
+                lastmount = GetTime()
                 return
             end
         end 
@@ -39,8 +45,6 @@ function tt:NavTo(x,y,z, closeenough)
         dmc.FaceDirection(radians, false)
         if P2Dist > .1 then
             localenv["MoveForwardStart"]()
-        else
-            localenv["MoveForwardStop"]()
         end
     end
 end

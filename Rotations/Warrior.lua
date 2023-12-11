@@ -49,15 +49,17 @@ function Warrior:Pulse(target)
                 tt:NavTo(target.x, target.y, target.z, true)
                 lastmove = GetTime()
             end
+            tt:Cast("Charge", target.pointer)
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
+            end
+            if not target:HasDebuff("Hamstring") then
+                tt:Cast("Hamstring", target.pointer)
             end
             if not target:HasDebuff("Rend") then
                 tt:Cast("Rend", target.pointer)
             end
-            if not tt.LocalPlayer:HasBuff("Enrage") then
-                tt:Cast("Enrage", "player")
-            end
+            tt:Cast("Rampage", target.pointer)
             tt:Cast("Execute", target.pointer)
             tt:Cast("Bloodthirst", target.pointer)
             tt:Cast("Raging Blow", target.pointer)
@@ -73,20 +75,34 @@ function Warrior:Pulse(target)
 
             local caster = tt.CombatHelpers:GetClosestCaster(5)
             if caster ~= nil then
-                tt:Cast("Pummel", caster.pointer)
+                if tt:Cast("Pummel", caster.pointer) then return end
             end
 
-            tt:Cast("Charge", target.pointer)
+            --if tt:Cast("Charge", target.pointer) then return end
+            if target.Distance > 20 then
+                localenv["CastSpellByName"]("Heroic Leap")
+                print("leaping")
+                if dmc.IsSpellPending() then
+                    dmc.ClickPosition(target.x, target.y, target.z)
+                end
+            end
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
             end
             if not tt.LocalPlayer:HasBuff("Enrage") then
                 tt:Cast("Enrage", "player")
             end
+            if not target:HasDebuff("Hamstring") then
+                tt:Cast("Hamstring", target.pointer)
+            end
+            if not target:HasDebuff("Rend") then
+                tt:Cast("Rend", target.pointer)
+            end
             if tt:Cast("Warbreaker", target.pointer) then return end
             if tt:Cast("Execute", target.pointer) then return end
             if tt:Cast("Overpower", target.pointer) then return end
             if tt:Cast("Mortal Strike", target.pointer) then return end
+            if tt:Cast("Slam", target.pointer) then return end
         end
 
         if spec == 2 then

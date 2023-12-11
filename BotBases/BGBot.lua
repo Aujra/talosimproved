@@ -36,9 +36,6 @@ tinsert(tt.movespot, spot)
 tinsert(tt.movespot, spots)
 tinsert(tt.movespot, spot2)
 
-local bspot = tt.Classes.Spot(1803.0208740234, 1539.9670410156, 1249.1867675781, 566, 671.68951416016, 222.47822570801, 320.1237487793)
-tinsert(tt.badspot, bspot)
-
 function BGBot:Pulse()
     self:BuildMoveScores()
     self:BuildTargetScores()
@@ -65,6 +62,10 @@ function BGBot:Pulse()
         end
     else
         local role = UnitGroupRolesAssigned("player")
+
+        if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
+            TogglePVPUI()
+        end
 
         self:BuildMoveScores()
         self:BuildTargetScores()
@@ -264,6 +265,7 @@ function BGBot:InMoveSpot()
             local px, py, pz = v.facex, v.facey, v.facez
             local dx, dy, dz = x-px, y-py, z-pz
             local radians = math.atan2(-dy, -dx)
+            dmc.FaceDirection(radians, false)
             localenv["MoveForwardStart"]()
             return true
         end
@@ -293,7 +295,7 @@ function BGBot:ClosestTarget()
     local closestdist = 999999
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and dmc.GetDistance3D("player", v.pointer) < 150 and dmc.GetDistance3D("player", v.pointer) < closestdist and v.Reaction <= 3 and not v.Dead then
+            if v.Distance ~= nil and v.Distance < 150 and v.Distance < closestdist and v.Reaction <= 3 and not v.Dead then
             --and not v.LOS() then
                 closestdist = v.Distance
                 closest = v
