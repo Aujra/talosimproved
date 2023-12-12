@@ -76,45 +76,33 @@ function Monk:Pulse(target)
             tt:Cast("Rising Sun Kick", target.pointer)
         end
 
-        if spec == 3 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
-            if not tt.LocalPlayer:HasBuff("Icy Veins") then
-                tt:Cast("Icy Veins", "player")
-            end
-            if not tt.LocalPlayer:HasBuff("Rune of Power") then
-                tt:Cast("Rune of Power", "player")
-            end
-            if not tt.LocalPlayer:HasBuff("Arcane Intellect") then
-                tt:Cast("Arcane Intellect", "player")
-            end
-            if tt.LocalPlayer:HasBuff("Brain Freeze") then
-                tt:Cast("Flurry", target.pointer)
-            end
-            if tt.LocalPlayer:HasBuff("Fingers of Frost") then
-                tt:Cast("Ice Lance", target.pointer)
-            end
-            tt:Cast("Frozen Orb", target.pointer)
-            tt:Cast("Ice Nova", target.pointer)
-            tt:Cast("Frostbolt", target.pointer)
-        end
-
         if spec == 2 then
             if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end     
-            if not tt.LocalPlayer:HasBuff("Blazing Barrier") then
-                tt:Cast("Blazing Barrier", "player")
+            local lowest = tt.CombatHelpers:LowestFriend()
+            if lowest ~= nil then
+                if lowest.HealthPercent < 50 then
+                    tt:Cast("Life Cocoon", lowest.pointer)
+                end
+                if lowest.HealthPercent < 20 then
+                    tt:Cast("Revival", lowest.pointer)
+                end
+                if lowest.HealthPercent < 80 then
+                    tt:Cast("Vivify", lowest.pointer)
+                end
             end
-            tt:Cast("Combustion", "player")
-            if tt.LocalPlayer:HasBuff("Hot Streak!") then
-                tt:Cast("Pyroblast", target.pointer)
+        end
+
+        if spec == 3 then
+            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
+                tt:NavTo(target.x, target.y, target.z)
             end
-            if tt.LocalPlayer:HasBuff("Heating Up") then
-                tt:Cast("Fire Blast", target.pointer)
-            end            
-            tt:Cast("Fireball", target.pointer)
+            localenv["CastSpellByName"]("Rising Sun Kick", target.pointer)
+            localenv["CastSpellByName"]("Fists of Fury", target.pointer)
+            localenv["CastSpellByName"]("Blackout Kick", target.pointer)
+            localenv["CastSpellByName"]("Whirling Dragon Punch", target.pointer)
+            localenv["CastSpellByName"]("Tiger Palm", target.pointer)
         end
     end
 end

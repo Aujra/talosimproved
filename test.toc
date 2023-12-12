@@ -50,6 +50,8 @@ Rotations\Warrior.lua
 Rotations\Mage.lua
 Rotations\Paladin.lua
 Rotations\Monk.lua
+Rotations\Hunter.lua
+Rotations\Priest.lua
 Rotations\CombatHelpers.lua
 
 UI\ObjectViewer.lua     

@@ -26,7 +26,6 @@ function tt:ToggleObjectViewer()
 end
 
 function tt:SelectGroup(group)
-    print("SelectGroup", group)
     if group == "objects" then
         ObjectViewer.mode = "objects"
     end
@@ -35,6 +34,9 @@ function tt:SelectGroup(group)
     end
     if group == "units" then
         ObjectViewer.mode = "units"
+    end
+    if group == "areatriggers" then
+        ObjectViewer.mode = "areatriggers"
     end
     local str = string.gsub(" "..ObjectViewer.mode, "%W%l", string.upper):sub(2)
     OMFrame:SetTitle("Object Manager - " .. str)
@@ -67,6 +69,12 @@ end
 
 function tt:updateObjectViewer()
     local data = {}
+    if ObjectViewer.mode == "areatriggers" then
+        for k,v in pairs(tt.areatriggers) do
+            local tree = {"", v.name, string.format("%0d",v.Distance), 0, 0, 0, 0, 0, v.radius}
+            table.insert(data, tree)
+        end
+    end
     if ObjectViewer.mode == "objects" then
         for k,v in pairs(tt.gameobjects) do
             local tree = {"", v.Name, string.format("%0d",v.Distance), 0, 0, 0, 0, string.format("%02d",v.HP), v.radius}
@@ -124,6 +132,12 @@ if not OMFrame then
     unitsbutton:SetWidth(100)
     unitsbutton:SetCallback("OnClick", function() tt:SelectGroup("units") end)
     OMFrame:AddChild(unitsbutton)
+
+    local triggers = AceGUI:Create("Button")
+    triggers:SetText("Units")
+    triggers:SetWidth(100)
+    triggers:SetCallback("OnClick", function() tt:SelectGroup("areatriggers") end)
+    OMFrame:AddChild(triggers)
 
     tt:AddColumn("Reaction")
     tt:AddColumn("Name")

@@ -16,6 +16,7 @@ function tt:UpdateOM()
     end
 
     if #added > 0 then
+        tt.areatriggerdraw:ClearCanvas()
         for _, v in pairs(added) do 
             if dmc.ObjectType(v) == 11 then
                 if tt.areatriggers[v] then
@@ -78,6 +79,7 @@ end
 function tt:ClearOldObjects()
     for k,v in pairs(tt.areatriggers) do
         if not dmc.ObjectExists(v.pointer) then
+            tt.areatriggers[k]:Destroy()
             tt.areatriggers[k] = nil
         end
         if not dmc.ObjectExists(v.pointer) then

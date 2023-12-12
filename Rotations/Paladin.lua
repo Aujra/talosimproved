@@ -70,6 +70,25 @@ function Paladin:Pulse(target)
             tt:Cast("Shield of the Righteous", target.pointer)
             tt:Cast("Hammer of the Righteous", target.pointer)
         end
+
+        if spec == 1 then
+            if target.Distance > 30 then
+                tt:NavTo(target.x, target.y, target.z)
+            end     
+            local lowest = tt.CombatHelpers:LowestFriend()
+            if lowest ~= nil then
+                if lowest.HP < 50 then
+                    localenv["CastSpellByName"]("Flash of Light", lowest.pointer)
+                end
+                if lowest.HP < 20 then
+                    tt:Cast("Lay on Hands", lowest.pointer)
+                end
+                if lowest.HP < 80 then
+                    localenv["CastSpellByName"]("Holy Light", lowest.pointer)
+                end
+            end
+        end
+
     end
 end
 

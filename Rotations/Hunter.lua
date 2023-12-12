@@ -1,26 +1,26 @@
 local tt = tt
-tt.rotations.Mage = class()
-local Mage = tt.rotations.Mage
+tt.rotations.Hunter = class()
+local Hunter = tt.rotations.Hunter
 
-Mage.name = "Mage"
-Mage.class = "mage"
+Hunter.name = "Hunter"
+Hunter.class = "Hunter"
 
-function Mage:init()
+function Hunter:init()
 end
 
-function Mage:SetRange()
+function Hunter:SetRange()
     tt.combatrange = 35
     tt.pullrange = 35
 end
 
-function Mage:Pull()
+function Hunter:Pull()
     if localenv["UnitAffectingCombat"]("player") then
         return self:Pulse()
     end
     tt:Cast("Fireball", tar)
 end
 
-function Mage:Pulse(target)
+function Hunter:Pulse(target)
     local spec = GetSpecialization()
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then 
         return 
@@ -53,27 +53,14 @@ function Mage:Pulse(target)
             if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end   
-            if not tt.LocalPlayer:HasBuff("Arcane Power") then
-                tt:Cast("Arcane Power", "player")
+            local hasUI, isHunterPet = HasPetUI();
+            if not hasUI then
+                localenv["CastSpellByName"]("Call Pet 1")
             end
-            if not tt.LocalPlayer:HasBuff("Rune of Power") then
-                tt:Cast("Rune of Power", "player")
-            end
-            if not tt.LocalPlayer:HasBuff("Arcane Familiar") then
-                tt:Cast("Arcane Familiar", "player")
-            end
-            if not tt.LocalPlayer:HasBuff("Arcane Intellect") then
-                tt:Cast("Arcane Intellect", "player")
-            end
-            if tt.LocalPlayer:HasBuff("Clearcasting") then
-                tt:Cast("Arcane Missiles", target.pointer)
-            end
-            if tt.LocalPlayer.arcane ~= nil and tt.LocalPlayer.arcane < 4 then
-                tt:Cast("Arcane Blast", target.pointer)
-            end
-            if tt.LocalPlayer.arcane == 4 then
-                tt:Cast("Arcane Barrage", target.pointer)
-            end
+            localenv["CastSpellByName"]("Kill Command")
+            localenv["CastSpellByName"]("Bestial Wrath")
+            localenv["CastSpellByName"]("Cobra Shot")
+            localenv["CastSpellByName"]("Barbed Shot")
         end
 
         if spec == 3 then
@@ -104,19 +91,18 @@ function Mage:Pulse(target)
             if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
                 tt:NavTo(target.x, target.y, target.z)
             end     
-            if not tt.LocalPlayer:HasBuff("Blazing Barrier") then
-                tt:Cast("Blazing Barrier", "player")
+            if not target:HasDebuff("Hunter's Mark") then
+                localenv["CastSpellByName"]("Hunter's Mark", target.pointer)
             end
-            tt:Cast("Combustion", "player")
-            if tt.LocalPlayer:HasBuff("Hot Streak!") then
-                tt:Cast("Pyroblast", target.pointer)
+            localenv["CastSpellByName"]("Kill Shot")
+            localenv["CastSpellByName"]("Rapid Fire")
+            if tt.LocalPlayer:HasBuff("Precise Shots") then
+                localenv["CastSpellByName"]("Multi-Shot", target.pointer)
             end
-            if tt.LocalPlayer:HasBuff("Heating Up") then
-                tt:Cast("Fire Blast", target.pointer)
-            end            
-            tt:Cast("Fireball", target.pointer)
+            localenv["CastSpellByName"]("Aimed Shot", target.pointer)
+            localenv["CastSpellByName"]("Steady Shot", target.pointer)
         end
     end
 end
 
-tt:RegisterRotation(Mage.name, Mage)
+tt:RegisterRotation(Hunter.name, Hunter)

@@ -16,6 +16,7 @@ local lastOMUpdate = 0
 tt.draw = nil
 tt.scoredraw = nil
 tt.bgdraw = nil
+tt.areatriggerdraw = nil
 
 tt.combatrange = 25
 tt.pullrange = 35
@@ -37,12 +38,17 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
         afkrest = GetTime()
         dmc.ResetAfk()
     end
+
     if tt.draw == nil then
         tt.draw = Draw:New()
     end
     if tt.scoredraw == nil then
         tt.scoredraw = Draw:New()
     end
+    if tt.areatriggerdraw == nil then
+        tt.areatriggerdraw = Draw:New()
+    end
+
     if not tt.running then return end
     tt.time = tt.time + elapsed
     if tt.time > lastOMUpdate + .1 then
