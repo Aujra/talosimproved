@@ -8,6 +8,10 @@ Druid.class = "druid"
 local druidFrame
 local lastMove = 0
 
+local lastpulse = 0
+
+local targetcachetime = 0
+
 function Druid:init()
 end
 
@@ -34,6 +38,11 @@ function Druid:Pulse(target)
         return 
     end
 
+    if GetTime() - lastpulse < 0.2 then
+        return
+    end
+    lastpulse = GetTime()
+
     if target ~= nil then
         if type(target) == "string" then
             target = tt:GetObjectByGUID(target)
@@ -41,17 +50,16 @@ function Druid:Pulse(target)
         local tarob = tt:GetObjectByGUID(target)
 
         if spec == 1 then
-            if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.PosX, target.PosY, target.PosZ)
-            else
-                if GetTime() - lastMove > .5 then
-                    localevn["MoveForwardStop"]()
-                    lastMove = GetTime()
-                    return
-                end
-            end
+            tt.combatrange = 30
 
-            local caster = tt.CombatHelpers:GetClosestCaster(40)
+            if GetTime() - targetcachetime > 0.5 then
+                local moonfirecount = tt.CombatHelpers:GetDebuffCount("Moonfire")
+                local sunfirecount = tt.CombatHelpers:GetDebuffCount("Sunfire")
+                local closest_no_moonfire = tt.CombatHelpers:ClosestWithoutDebuff("Moonfire")
+                local caster = tt.CombatHelpers:GetClosestCaster(30)
+                targetcachetime = GetTime()
+            end
+            
             if caster ~= nil then
                 tt:Cast("Solar Beam", caster.pointer)
             end
@@ -66,11 +74,6 @@ function Druid:Pulse(target)
                 tt:Cast("Sunfire", target.pointer)
             end
 
-            local moonfirecount = tt.CombatHelpers:GetDebuffCount("Moonfire")
-            local sunfirecount = tt.CombatHelpers:GetDebuffCount("Sunfire")
-            local closest_no_moonfire = tt.CombatHelpers:ClosestWithoutDebuff("Moonfire")
-
-
             tt:Cast("Celestial Alignment", "player")
             tt:Cast("Convoke the Spirits", target.pointer)
             tt:Cast("Starsurge", target.pointer)
@@ -80,13 +83,17 @@ function Druid:Pulse(target)
             tt:Cast("wrath", target.pointer)
         end
         if spec == 2 then
-            if target.Distance > tt.combatrange and tt.botbases[tt.botbase].allowMovement then
+            tt.combatrange = 5
+
+            if target.Distance > 5 then
                 tt:NavTo(target.x, target.y, target.z)
-            end
-            
-            if target.Distance < (tt.combatrange/2) and GetTime() - lastMove > .5 then
+            else
                 localenv["MoveForwardStop"]()
-                lastMove = GetTime()
+            end
+
+            if GetTime() - targetcachetime > 0.5 then
+                local caster = tt.CombatHelpers:GetClosestCaster(8)
+                targetcachetime = GetTime()
             end
 
             if GetShapeshiftForm() ~= 2 then
@@ -97,11 +104,18 @@ function Druid:Pulse(target)
                 tt:Cast("Prowl", "player")
             end
 
+            if caster ~= nil then
+                tt:Cast("Skull Bash", caster.pointer)
+            end
+
             if tt.LocalPlayer:HasBuff("Predatory Swiftness") then
                 tt:Cast("Regrowth", "player")
             end
 
-            tt:Cast("Wild Charge", target.pointer)
+            if tt.botbases[tt.botbase].allowMovement and target.Distance > 8 then
+                tt:Cast("Wild Charge", target.pointer)
+            end
+            
             if tt.LocalPlayer.power < 40 then
                 tt:Cast("Tiger's Fury", "player")
             end
@@ -134,10 +148,8 @@ function Druid:Pulse(target)
             local lowest = tt.CombatHelpers:LowestFriend()         
             
             local lbcount = tt.CombatHelpers:GetBuffCount("Lifebloom")
-            print("lbcount is " .. lbcount)
 
             if lowest ~= nil then
-                print("lowest is " .. lowest.Name .. " " .. lowest.HP)
                 if lowest.HP < 95 and lbcount < 1 then
                     tt:Cast("Lifebloom", lowest.pointer)
                 end

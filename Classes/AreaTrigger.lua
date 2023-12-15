@@ -23,6 +23,7 @@ function AreaTrigger:Update()
     self.radius = 7
     self.flags = dmc.UnitDynamicFlags(self.pointer)
     self.timeleft = self.initTime + self.duration - tt.time
+    self.Distance = dmc.GetDistance3D(self.x, self.y, self.z, tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z)
     self:Debug()
 end
 

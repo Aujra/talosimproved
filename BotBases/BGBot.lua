@@ -103,7 +103,6 @@ function BGBot:Pulse()
         end
 
         if self:InMoveSpot() then
-            print("in move spot")
             return
         end
 
@@ -123,15 +122,10 @@ function BGBot:Pulse()
 
         besttarget = self:ClosestTarget()
         local closestheal = tt.CombatHelpers:GetClosestHeal(101, 40)
+        tt.besttarget = besttarget       
 
-        --if role == "HEALER" then besttarget = closestheal end
-
-        tt.besttarget = besttarget
-
-
-        if besttarget ~= nil and role ~= "HEALER" then
+        if besttarget ~= nil then
             if besttarget.Distance < tt.pullrange then
-                localenv["MoveForwardStop"]()
                 tt:SetStatusText("Targeting best target " .. besttarget.Name .. " " .. besttarget.Distance)
                 localenv["TargetUnit"](besttarget.pointer)
                 local x, y, z = dmc.GetUnitPosition("player")
@@ -141,45 +135,26 @@ function BGBot:Pulse()
                 end
                 local dx, dy, dz = x-px, y-py, z-pz
                 local radians = math.atan2(-dy, -dx)
-                dmc.FaceDirection(radians, false)
-                tt.rotations[tt.rotation]:Pulse(besttarget)
-                return
+                dmc.FaceDirection(radians, false)        
+                tt.rotations[tt.rotation]:Pulse(besttarget)         
             else
                 tt:SetStatusText("Moving to best target " .. besttarget.Name .. " " .. besttarget.Distance)
                 tt:NavTo(besttarget.x, besttarget.y, besttarget.z)
                 return
             end
+            return
         end
 
-        if bestmove ~= nil then
-            if bestmove.Distance < tt.pullrange then
-                if bestmove.Distance < (tt.pullrange - 5) then
-                    localenv["MoveForwardStop"]()
-                end
-                if role == "HEALER" then
-                    local x, y, z = dmc.GetUnitPosition("player")
-                    local px, py, pz = dmc.GetUnitPosition(bestmove.pointer)
-                    if (px == nil) then
-                        return
-                    end
-                    local dx, dy, dz = x-px, y-py, z-pz
-                    local radians = math.atan2(-dy, -dx)
-                    dmc.FaceDirection(radians, false)
-                    tt.rotations[tt.rotation]:Pulse(bestmove)
-                end
-                return
-            else
+        if bestmove ~= nil and bestmove.Distance > tt.pullrange then                    
                 tt:SetStatusText("Moving to best move spot " .. bestmove.Name .. " " .. bestmove.Distance)
                 tt:NavTo(bestmove.x, bestmove.y, bestmove.z)
                 return
-            end
         end
-
     end
 end
 
 function BGBot:BuildMoveScores()
-    if GetTime() - lastupdate < 2.5 then
+    if GetTime() - lastupdate < 3 then
         return
     end
 
@@ -227,7 +202,7 @@ end
 
 
 function BGBot:BuildTargetScores()
-    if GetTime() - lasttargetupdate < .5 then
+    if GetTime() - lasttargetupdate < 2.5 then
         return
     end
 

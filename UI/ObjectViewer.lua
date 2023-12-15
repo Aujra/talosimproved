@@ -12,6 +12,8 @@ local ScrollTable = nil
 local green ="|cFF00FF00"
 local red ="|cffff0000"
 
+local searchstring = ""
+
 ObjectViewer.mode = "objects"
 
 local cols = { 
@@ -59,10 +61,7 @@ function tt:AddColumn(name)
             ["g"] = 0.0, 
             ["b"] = 0.0, 
             ["a"] = 1.0 
-        }, -- red backgrounds, eww!
-        ["defaultsort"] = "dsc",
-        ["sortnext"]= 4, 
-        ["DoCellUpdate"] = nil,
+        },
     }
     table.insert(cols, column)
 end
@@ -92,13 +91,13 @@ function tt:updateObjectViewer()
             else
                 react = "Friendly"
             end
-            local tree = {react,v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), string.format("%0d", v.targetScore), string.format("%02d",v.HP), v.radius}
+            local tree = {v.Distance}
             table.insert(data, tree)
         end
     end
     if ObjectViewer.mode == "units" then
         for k,v in pairs(tt.units) do
-            local tree = {"", v.Name, string.format("%0d",v.Distance), v.FriendsAround, v.EnemiesAround, string.format("%0d", v.score), v.targetScore, string.format("%02d",v.HP)}
+            local tree = {v.Name, v.Distance, v.score}
             table.insert(data, tree)
         end
     end
@@ -134,45 +133,40 @@ if not OMFrame then
     OMFrame:AddChild(unitsbutton)
 
     local triggers = AceGUI:Create("Button")
-    triggers:SetText("Units")
+    triggers:SetText("Areatriggers")
     triggers:SetWidth(100)
     triggers:SetCallback("OnClick", function() tt:SelectGroup("areatriggers") end)
     OMFrame:AddChild(triggers)
 
-    tt:AddColumn("Reaction")
     tt:AddColumn("Name")
     tt:AddColumn("Distance")
-    tt:AddColumn("Friends")
-    tt:AddColumn("Enemies")
     tt:AddColumn("Score")
-    tt:AddColumn("TargetScore")
-    tt:AddColumn("HP")
-    tt:AddColumn("Radius")
 
     if ScrollTable == nil then
         ScrollTable = ScrollingTable:CreateST(cols, nil, nil, nil, OMFrame.frame);
+        ScrollTable:SetFilter(function(self, row)
+            if searchstring == "" then
+                return true
+            else 
+                for k,v in pairs(row) do
+                    if string.find(tostring(v):lower(), searchstring:lower(), 1, true) then
+                        return true
+                    end
+                end
+                return false
+            end
+        end)
     end
 
     tt:updateObjectViewer()
 
     local pullrange = tt.AceGUI:Create("EditBox")
-    pullrange:SetLabel("Pull Range")
-    pullrange:SetWidth(100)
-    pullrange:SetText(tt.pullrange)
-    pullrange:SetCallback("OnEnterPressed", function(self, event, text)
-        tt.pullrange = tonumber(text)
-        print("tt.pullrange", tt.pullrange)
+    pullrange:SetLabel("Search")
+    pullrange:SetWidth(500)
+    pullrange:SetText("Search Here")
+    pullrange:SetCallback("OnTextChanged", function(self, event, text)
+        searchstring = text
     end)
     OMFrame:AddChild(pullrange)
-
-    local combatrange = tt.AceGUI:Create("EditBox")
-    combatrange:SetLabel("Combat Range")
-    combatrange:SetWidth(100)
-    combatrange:SetText(tt.combatrange)
-    combatrange:SetCallback("OnEnterPressed", function(self, event, text)
-        tt.combatrange = tonumber(text)
-        print("tt.combatrange", tt.combatrange)
-    end)
-    OMFrame:AddChild(combatrange)
     OMFrame:Hide()
 end

@@ -225,12 +225,10 @@ local function Constructor(params)
     local num  = AceGUI:GetNextWidgetNum(Type)
     local frame = CreateFrame("Frame", nil, UIParent)
     frame:Hide()
-    
-    print(params)
 
-    --local f = CreateFrame("Frame", "ScrollTableHolder" .. num, frame, BackdropTemplateMixin and "BackdropTemplate");
+    local f = CreateFrame("Frame", "ScrollTableHolder" .. num, frame, BackdropTemplateMixin and "BackdropTemplate");
     ScrollTableInstance = ScrollTableLib:CreateST(params, nil, nil, nil, frame)
-    --ScrollTableInstance:SetData(fake_data, true)
+   -- ScrollTableInstance:SetData(fake_data, true)
     
     local widget = {
         alignoffset = 30,
