@@ -38,7 +38,7 @@ function Druid:Pulse(target)
         return 
     end
 
-    if GetTime() - lastpulse < 0.2 then
+    if GetTime() - lastpulse < 0.5 then
         return
     end
     lastpulse = GetTime()
@@ -51,6 +51,10 @@ function Druid:Pulse(target)
 
         if spec == 1 then
             tt.combatrange = 30
+
+            if target.Distance < tt.combatrange then
+                localenv["MoveForwardStop"]()
+            end
 
             if GetTime() - targetcachetime > 0.5 then
                 local moonfirecount = tt.CombatHelpers:GetDebuffCount("Moonfire")
@@ -88,7 +92,11 @@ function Druid:Pulse(target)
             if target.Distance > 5 then
                 tt:NavTo(target.x, target.y, target.z)
             else
-                localenv["MoveForwardStop"]()
+                print("Stop started")
+                C_Timer.After(.3, function()
+                    print("Actually stopping")
+                    localenv["MoveForwardStop"]()
+                end)
             end
 
             if GetTime() - targetcachetime > 0.5 then

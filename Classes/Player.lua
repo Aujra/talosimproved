@@ -15,6 +15,16 @@ function Player:Update()
     self:Debug()
 end
 
+function Player:ToTable()
+    local table = {
+        self.Name,
+        self.Distance,
+        self.score,
+        self.NextUpdate
+    }
+    return table
+end
+
 function Player:Debug()
     if tt.scoredraw == nil then
         tt.scoredraw = Draw:New()

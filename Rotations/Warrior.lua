@@ -23,32 +23,17 @@ end
 
 function Warrior:Pulse(target)
     local spec = GetSpecialization()
+    self:SetRange()
+    tt.rotations.BaseRotation:Pulse(target)
+
+    local tar = tt.rotations.BaseRotation:NormalizeTarget(target)
+
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then 
         return 
     end
 
-    if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end      
-
-        local tarob = tt:GetObjectByGUID(target)
-        local x, y, z = dmc.GetUnitPosition("player")
-        local px, py, pz = dmc.GetUnitPosition(target.pointer)
-        if (px == nil) then
-            return
-        end
-        local dx, dy, dz = x-px, y-py, z-pz
-        local radians = math.atan2(-dy, -dx)
-        if tt.botbases[tt.botbase].allowMovement then
-            dmc.FaceDirection(radians, false)
-        end
-
+    if target ~= nil then       
         if spec == 2 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement and GetTime() then
-                tt:NavTo(target.x, target.y, target.z, true)
-                lastmove = GetTime()
-            end
             tt:Cast("Charge", target.pointer)
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
@@ -67,10 +52,8 @@ function Warrior:Pulse(target)
         end
 
         if spec == 1 then
-            if target.Distance > 3 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            else
-                --localenv["MoveForwardStop"]()
+            if not IsCurrentSpell(6603) then
+                localenv["StartAttack"]()
             end
 
             local caster = tt.CombatHelpers:GetClosestCaster(5)
@@ -78,7 +61,7 @@ function Warrior:Pulse(target)
                 if tt:Cast("Pummel", caster.pointer) then return end
             end
 
-            --if tt:Cast("Charge", target.pointer) then return end
+            if tt:Cast("Charge", target.pointer) then return end
             if target.Distance > 20 then
                 localenv["CastSpellByName"]("Heroic Leap")
                 print("leaping")
@@ -103,12 +86,7 @@ function Warrior:Pulse(target)
             if tt:Cast("Overpower", target.pointer) then return end
             if tt:Cast("Mortal Strike", target.pointer) then return end
             if tt:Cast("Slam", target.pointer) then return end
-        end
-
-        if spec == 2 then
-            
-        end
-          
+        end      
     end
 end
 

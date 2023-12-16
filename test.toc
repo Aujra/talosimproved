@@ -44,6 +44,7 @@ BotBases\BGBot.lua
 BotBases\RotationBot.lua
 BotBases\DungeonBot.lua
 
+Rotations\BaseRotation.lua
 Rotations\External.lua
 Rotations\Druid.lua
 Rotations\Warrior.lua

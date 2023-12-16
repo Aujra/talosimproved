@@ -68,6 +68,11 @@ end
 
 function tt:updateObjectViewer()
     local data = {}
+    local selected = ScrollTable:GetSelection()
+    if selected ~= nil then
+        row = ScrollTable:GetRow(selected)
+        print(row[1])
+    end
     if ObjectViewer.mode == "areatriggers" then
         for k,v in pairs(tt.areatriggers) do
             local tree = {"", v.name, string.format("%0d",v.Distance), 0, 0, 0, 0, 0, v.radius}
@@ -76,33 +81,25 @@ function tt:updateObjectViewer()
     end
     if ObjectViewer.mode == "objects" then
         for k,v in pairs(tt.gameobjects) do
-            local tree = {"", v.Name, string.format("%0d",v.Distance), 0, 0, 0, 0, string.format("%02d",v.HP), v.radius}
+            local tree = v:ToTable()
             table.insert(data, tree)
         end
     end
     if ObjectViewer.mode == "players" then
-        table.sort(tt.players, function(x, y)
-            return x.score > y.score
-        end)
-        for k,v in pairs(tt.players) do
-            local react = ""
-            if v.Reaction <= 3 then
-                react = "Hostile"
-            else
-                react = "Friendly"
-            end
-            local tree = {v.Distance}
+        for k,v in pairs(tt.players) do           
+            local tree = v:ToTable()
             table.insert(data, tree)
         end
     end
     if ObjectViewer.mode == "units" then
         for k,v in pairs(tt.units) do
-            local tree = {v.Name, v.Distance, v.score}
+            local tree = v:ToTable()
             table.insert(data, tree)
         end
     end
     ScrollTable:SetData(data, true)
     ScrollTable:SetWidth(950)    
+    ScrollTable:EnableSelection()
     
 
 end
@@ -141,6 +138,7 @@ if not OMFrame then
     tt:AddColumn("Name")
     tt:AddColumn("Distance")
     tt:AddColumn("Score")
+    tt:AddColumn("Next Update")
 
     if ScrollTable == nil then
         ScrollTable = ScrollingTable:CreateST(cols, nil, nil, nil, OMFrame.frame);

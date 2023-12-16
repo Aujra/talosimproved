@@ -1,5 +1,5 @@
 local tt = tt
-tt.rotations.Hunter = class()
+tt.rotations.Hunter = tt.rotations.BaseRotation:extend()
 local Hunter = tt.rotations.Hunter
 
 Hunter.name = "Hunter"
@@ -25,6 +25,8 @@ function Hunter:Pulse(target)
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then 
         return 
     end
+
+    tt.rotations.BaseRotation:Pulse(target)
 
     if target ~= nil then
         if type(target) == "string" then
@@ -87,13 +89,19 @@ function Hunter:Pulse(target)
             tt:Cast("Frostbolt", target.pointer)
         end
 
-        if spec == 2 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 2 then  
+            local caster = tt.CombatHelpers:GetClosestCaster(30)
+            if caster ~= nil then
+                tt:Cast("Counter Shot", caster.pointer)
+            end
             if not target:HasDebuff("Hunter's Mark") then
                 localenv["CastSpellByName"]("Hunter's Mark", target.pointer)
             end
+
+            if tt.LocalPlayer.HP < 50 then
+                localenv["CastSpellByName"]("Exhilaration")
+            end
+
             localenv["CastSpellByName"]("Kill Shot")
             localenv["CastSpellByName"]("Rapid Fire")
             if tt.LocalPlayer:HasBuff("Precise Shots") then

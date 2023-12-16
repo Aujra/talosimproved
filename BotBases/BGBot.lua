@@ -23,6 +23,7 @@ tt.besttarget = nil
 
 local bestmove = nil
 local besttarget = nil
+local nextpulse = 0
 
 tt.bgdraw = dmc.Draw:New()
 
@@ -36,6 +37,29 @@ tinsert(tt.movespot, spot)
 tinsert(tt.movespot, spots)
 tinsert(tt.movespot, spot2)
 
+function BGBot:HandleOutsideBG()
+    if GetTime() - nextpulse < 4 then
+        return
+    end
+    if HonorFrameQueueButton == nil or not HonorFrameQueueButton:IsVisible() and GetBattlefieldStatus(1) ~= "queued" then
+        TogglePVPUI()
+      end
+      if GetBattlefieldStatus(1) ~= "queued" and GetBattlefieldStatus(1) ~= "confirm" then
+        localenv["RunMacroText"]("/click HonorFrameQueueButton")
+        tt:SetStatusText("Queueing for BG")
+    end
+    if GetBattlefieldStatus(1) == "queued" then
+        tt:SetStatusText("Waiting for BG to pop currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
+        if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
+            TogglePVPUI()
+        end
+    end                                                 
+    if GetBattlefieldStatus(1) == "confirm" then             
+      localenv["AcceptBattlefieldPort"](1, true)
+      tt:SetStatusText("Accepting BG")
+    end
+end
+
 function BGBot:Pulse()
     self:BuildMoveScores()
     self:BuildTargetScores()
@@ -43,23 +67,7 @@ function BGBot:Pulse()
     tt.LocalPlayer:HasBuff("Regrowth")
 
     if not UnitInBattleground("player") then
-        if HonorFrameQueueButton == nil or not HonorFrameQueueButton:IsVisible() and GetBattlefieldStatus(1) ~= "queued" then
-          TogglePVPUI()
-        end
-        if GetBattlefieldStatus(1) ~= "queued" and GetBattlefieldStatus(1) ~= "confirm" then
-            localenv["RunMacroText"]("/click HonorFrameQueueButton")
-            tt:SetStatusText("Queueing for BG")
-        end
-        if GetBattlefieldStatus(1) == "queued" then
-            tt:SetStatusText("Waiting for BG to pop currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
-            if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
-                TogglePVPUI()
-            end
-        end                                                 
-        if GetBattlefieldStatus(1) == "confirm" then             
-          localenv["AcceptBattlefieldPort"](1, true)
-          tt:SetStatusText("Accepting BG")
-        end
+        self:HandleOutsideBG()       
     else
         local role = UnitGroupRolesAssigned("player")
 
@@ -103,6 +111,10 @@ function BGBot:Pulse()
         end
 
         if self:InMoveSpot() then
+            return
+        end
+
+        if GetTime() - nextpulse < 0.5 then
             return
         end
 
@@ -270,7 +282,8 @@ function BGBot:ClosestTarget()
     local closestdist = 999999
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and v.Distance < 150 and v.Distance < closestdist and v.Reaction <= 3 and not v.Dead then
+            if v.Distance ~= nil and v.Distance < 150 and v.Distance < closestdist and v.Reaction <= 3 and not v.Dead
+            then
             --and not v.LOS() then
                 closestdist = v.Distance
                 closest = v
