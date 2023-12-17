@@ -1,5 +1,5 @@
 local tt = tt
-tt.rotations.Druid = class()
+tt.rotations.Druid = tt.rotations.BaseRotation:extend()
 local Druid = tt.rotations.Druid
 
 Druid.name = "Druid"
@@ -15,7 +15,10 @@ local targetcachetime = 0
 function Druid:init()
 end
 
-function Druid:Pull()
+function Druid:OOC()
+    if not tt.LocalPlayer:HasBuff("Mark of the Wild") then
+        tt:Cast("Mark of the Wild", "player")
+    end
 end
 
 function Druid:SetRange()
@@ -38,39 +41,28 @@ function Druid:Pulse(target)
         return 
     end
 
-    if GetTime() - lastpulse < 0.5 then
-        return
-    end
-    lastpulse = GetTime()
-
     if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end        
-        local tarob = tt:GetObjectByGUID(target)
+        tt.rotations.BaseRotation:Pulse(target)
 
         if spec == 1 then
             tt.combatrange = 30
+            local caster = tt.CombatHelpers:GetClosestCaster(40)
 
-            if target.Distance < tt.combatrange then
-                localenv["MoveForwardStop"]()
-            end
-
-            if GetTime() - targetcachetime > 0.5 then
-                local moonfirecount = tt.CombatHelpers:GetDebuffCount("Moonfire")
-                local sunfirecount = tt.CombatHelpers:GetDebuffCount("Sunfire")
-                local closest_no_moonfire = tt.CombatHelpers:ClosestWithoutDebuff("Moonfire")
-                local caster = tt.CombatHelpers:GetClosestCaster(30)
-                targetcachetime = GetTime()
-            end
-            
             if caster ~= nil then
-                tt:Cast("Solar Beam", caster.pointer)
+                localenv["CastSpellByName"]("Solar Beam")
             end
             
             if GetShapeshiftForm() ~= 4 then
                 tt:Cast("Moonkin Form", "player")
             end
+
+            if tt.LocalPlayer.HP < 50 then
+                tt:Cast("Barkskin", "player")
+            end
+            if tt.LocalPlayer.HP < 40 then
+                tt:Cast("Renewal", "player")
+            end
+            
             if not target:HasDebuff("Moonfire", target.pointer) then
                 tt:Cast("Moonfire", target.pointer)
             end
@@ -84,36 +76,20 @@ function Druid:Pulse(target)
             if tt.LocalPlayer:HasBuff("Ownkin Frenzy") then
                 tt:Cast("Starfire", target.pointer)
             end
-            tt:Cast("wrath", target.pointer)
+            tt:Cast("Wrath", target.pointer)
         end
+
         if spec == 2 then
-            tt.combatrange = 5
-
-            if target.Distance > 5 then
-                tt:NavTo(target.x, target.y, target.z)
-            else
-                print("Stop started")
-                C_Timer.After(.3, function()
-                    print("Actually stopping")
-                    localenv["MoveForwardStop"]()
-                end)
-            end
-
-            if GetTime() - targetcachetime > 0.5 then
-                local caster = tt.CombatHelpers:GetClosestCaster(8)
-                targetcachetime = GetTime()
-            end
-
+            local caster = tt.CombatHelpers:GetClosestCaster(8)
             if GetShapeshiftForm() ~= 2 then
                 tt:Cast("Cat Form", "player")
+            end
+            if caster ~= nil then
+                tt:Cast("Skull Bash", caster.pointer)
             end
 
             if not localenv["UnitAffectingCombat"]("player") and not tt.LocalPlayer:HasBuff("Prowl") then
                 tt:Cast("Prowl", "player")
-            end
-
-            if caster ~= nil then
-                tt:Cast("Skull Bash", caster.pointer)
             end
 
             if tt.LocalPlayer:HasBuff("Predatory Swiftness") then
@@ -122,6 +98,10 @@ function Druid:Pulse(target)
 
             if tt.botbases[tt.botbase].allowMovement and target.Distance > 8 then
                 tt:Cast("Wild Charge", target.pointer)
+            end
+
+            if tt.LocalPlayer:HasBuff("Prowl") then
+                tt:Cast("Rake", target.pointer)
             end
             
             if tt.LocalPlayer.power < 40 then
@@ -153,11 +133,11 @@ function Druid:Pulse(target)
         end
 
         if spec == 4 then
-            local lowest = tt.CombatHelpers:LowestFriend()         
-            
+            local lowest = tt.CombatHelpers:LowestFriend()            
             local lbcount = tt.CombatHelpers:GetBuffCount("Lifebloom")
 
             if lowest ~= nil then
+                tt:Cast("Wild Growth", lowest.pointer)
                 if lowest.HP < 95 and lbcount < 1 then
                     tt:Cast("Lifebloom", lowest.pointer)
                 end

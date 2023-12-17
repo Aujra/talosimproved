@@ -3,6 +3,7 @@ tt.rotations.BaseRotation = class()
 local BaseRotation = tt.rotations.BaseRotation
 
 BaseRotation.skip = true
+BaseRotation.name = "skip"
 
 function BaseRotation:init()
 end

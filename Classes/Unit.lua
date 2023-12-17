@@ -27,8 +27,8 @@ function Unit:Update()
 end
 
 function Unit:IsCasting()
-    local name, _, _, _, startTime, endTime, _, _, _ = localenv["UnitCastingInfo"](self.pointer)
-    local name2, _, _, _, startTime2, endTime2, _, _, _ = localenv["UnitChannelInfo"](self.pointer)
+    local name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, notInterruptible, spellId = localenv["UnitCastingInfo"](self.pointer)
+    local name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, notInterruptible, spellId = localenv["UnitChannelInfo"](self.pointer)
     if name ~= nil then
         return true
     end

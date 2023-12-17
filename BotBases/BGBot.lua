@@ -77,6 +77,9 @@ function BGBot:Pulse()
 
         self:BuildMoveScores()
         self:BuildTargetScores()
+        if role == "HEALER" then
+            self:BuildHealScore()
+        end
 
         if GetBattlefieldWinner() then
             LeaveBattlefield()
@@ -234,6 +237,36 @@ function BGBot:BuildTargetScores()
             if v.Distance ~= nil and v.Distance < 15 then
                 score = score + 100000
             end
+            v.targetScore = score
+            tinsert(tt.PVPTargetScores, {score = score, player = v})
+        end
+    end
+    table.sort(tt.PVPTargetScores, function(x, y)
+        return 
+        x.score > y.score
+    end)
+    lasttargetupdate = GetTime()
+end
+
+function BGBot:BuildHealScore()
+    if GetTime() - lasttargetupdate < 2.5 then
+        return
+    end
+
+    for k,v in pairs(tt.PVPTargetScores) do tt.PVPTargetScores[k] = nil end
+
+    for k,v in pairs(tt.players) do
+        if not v.Dead and v.Reaction >= 5 and v.Distance ~= nil and v.Distance < 100 and not v:LOS() then
+            local score = 50000
+            if v.Distance == nil then
+                score = score - 100000
+            else
+                score = score - v.Distance
+            end
+            if v.Distance ~= nil and v.Distance < 15 then
+                score = score + 100000
+            end
+            score = score + (v.maxHealth - v.Health)
             v.targetScore = score
             tinsert(tt.PVPTargetScores, {score = score, player = v})
         end

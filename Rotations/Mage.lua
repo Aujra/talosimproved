@@ -101,9 +101,7 @@ function Mage:Pulse(target)
         end
 
         if spec == 2 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+            tt.rotations.BaseRotation:Pulse(target)
             if not tt.LocalPlayer:HasBuff("Blazing Barrier") then
                 tt:Cast("Blazing Barrier", "player")
             end

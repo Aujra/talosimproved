@@ -76,6 +76,7 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
             tt.scoredraw:ClearCanvas()
         end
         tt.rotations[tt.rotation]:SetRange()
+        tt.rotations[tt.rotation]:OOC()
         tt.botbases[tt.botbase]:Pulse()
     end
 end)

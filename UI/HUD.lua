@@ -51,10 +51,8 @@ for k,v in pairs(tt.botbases) do
     table.insert(botBaseNames, k)
 end
 for k,v in pairs(tt.rotations) do
-    if not v.skip then
-        if string.lower(v.class) == string.lower(UnitClass("player")) or v.class == "all" then
-            table.insert(rotationNames, k)
-        end
+    if string.lower(v.name) ~= "skip" and string.lower(v.class) == string.lower(UnitClass("player")) or v.class == "all" then
+        table.insert(rotationNames, k)
     end
 end
 
