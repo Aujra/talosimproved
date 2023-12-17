@@ -136,7 +136,7 @@ function Druid:Pulse(target)
             local lowest = tt.CombatHelpers:LowestFriend()            
             local lbcount = tt.CombatHelpers:GetBuffCount("Lifebloom")
 
-            if lowest ~= nil then
+            if lowest ~= nil and lowest.HP > 0 then
                 tt:Cast("Wild Growth", lowest.pointer)
                 if lowest.HP < 95 and lbcount < 1 then
                     tt:Cast("Lifebloom", lowest.pointer)
@@ -150,8 +150,11 @@ function Druid:Pulse(target)
                 if lowest.HP < 80 and not lowest:HasBuff("Rejuvenation") then
                     tt:Cast("Rejuvenation", lowest.pointer)
                 end
-
             end
+            if not target:HasDebuff("Moonfire", target.pointer) then
+                tt:Cast("Moonfire", target.pointer)
+            end
+            tt:Cast("Wrath", target.pointer)
         end
     end
 end
