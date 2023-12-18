@@ -57,6 +57,7 @@ Rotations\DemonHunter.lua
 Rotations\Rogue.lua
 Rotations\Warlock.lua
 Rotations\DeathKnight.lua
+Rotations\Shaman.lua
 Rotations\CombatHelpers.lua
 
 UI\ObjectViewer.lua     

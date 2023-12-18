@@ -6,12 +6,13 @@ function tt:NavTo(x,y,z, closeenough)
     closeenough = closeenough or false
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then
         localenv["MoveForwardStop"]()
+        lastmount = GetTime()
         return
     end
 
     local px, py, pz = dmc.GetUnitPosition("player")
     if dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, x, y, z) > 100 and not IsMounted() 
-       and not UnitCastingInfo("player") ~= nil and not IsIndoors() then
+       and not UnitCastingInfo("player") ~= nil and not IsIndoors() and GetTime() - lastmount > .5 then
         local useDruidMount = (UnitClass("player") == "Druid" and GetShapeshiftForm() ~= 3)
         if useDruidMount then
             localenv["CastSpellByName"]("Travel Form")
