@@ -9,6 +9,7 @@ end
 function LocalPlayer:Update()
     tt.Classes.Player.Update(self, point)
     self.arcane = localenv["UnitPower"]("player", 16)
+    self.pet = UnitIsVisible("pet")
 end
 
 function LocalPlayer:Debug()

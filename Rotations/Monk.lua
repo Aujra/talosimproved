@@ -1,5 +1,5 @@
 local tt = tt
-tt.rotations.Monk = class()
+tt.rotations.Monk = tt.rotations.BaseRotation:extend()
 local Monk = tt.rotations.Monk
 
 Monk.name = "Monk"
@@ -26,26 +26,9 @@ function Monk:Pulse(target)
     end
 
     if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end      
-
-        local tarob = tt:GetObjectByGUID(target)
-        local x, y, z = dmc.GetUnitPosition("player")
-        local px, py, pz = dmc.GetUnitPosition(target.pointer)
-        if (px == nil) then
-            return
-        end
-        local dx, dy, dz = x-px, y-py, z-pz
-        local radians = math.atan2(-dy, -dx)
-        if tt.botbases[tt.botbase].allowMovement then
-            dmc.FaceDirection(radians, false)
-        end
-
-        if spec == 1 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end   
+        tt.rotations.BaseRotation:Pulse(target)
+        target = tt.rotations.BaseRotation:NormalizeTarget(target)
+        if spec == 1 then 
             if not tt.LocalPlayer:HasBuff("Ironskin Brew") then
                 tt:Cast("Ironskin Brew", "player")
             end
@@ -76,10 +59,7 @@ function Monk:Pulse(target)
             tt:Cast("Rising Sun Kick", target.pointer)
         end
 
-        if spec == 2 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 2 then 
             local lowest = tt.CombatHelpers:LowestFriend()
             if lowest ~= nil then
                 if lowest.HealthPercent < 50 then
@@ -95,9 +75,6 @@ function Monk:Pulse(target)
         end
 
         if spec == 3 then
-            if target.Distance > 5 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end
             localenv["CastSpellByName"]("Rising Sun Kick", target.pointer)
             localenv["CastSpellByName"]("Fists of Fury", target.pointer)
             localenv["CastSpellByName"]("Blackout Kick", target.pointer)

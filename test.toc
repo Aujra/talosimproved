@@ -53,6 +53,10 @@ Rotations\Paladin.lua
 Rotations\Monk.lua
 Rotations\Hunter.lua
 Rotations\Priest.lua
+Rotations\DemonHunter.lua
+Rotations\Rogue.lua
+Rotations\Warlock.lua
+Rotations\DeathKnight.lua
 Rotations\CombatHelpers.lua
 
 UI\ObjectViewer.lua     

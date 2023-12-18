@@ -15,10 +15,8 @@ function Warrior:SetRange()
     tt.pullrange = 25
 end
 
-function Warrior:Pull()
-    if localenv["UnitAffectingCombat"]("player") then
-        return self:Pulse()
-    end
+function Warrior:OOC()
+    
 end
 
 function Warrior:Pulse(target)
@@ -26,15 +24,20 @@ function Warrior:Pulse(target)
     self:SetRange()
     tt.rotations.BaseRotation:Pulse(target)
 
-    local tar = tt.rotations.BaseRotation:NormalizeTarget(target)
+    target = tt.rotations.BaseRotation:NormalizeTarget(target)
 
     if UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then 
         return 
     end
 
+    local caster = tt.CombatHelpers:GetClosestCaster(8)
+
     if target ~= nil then       
         if spec == 2 then
             tt:Cast("Charge", target.pointer)
+            if caster ~= nil then
+                tt:Cast("Pummel", caster.pointer)
+            end
             if not tt.LocalPlayer:HasBuff("Battle Shout") then
                 tt:Cast("Battle Shout", "player")
             end
@@ -51,12 +54,39 @@ function Warrior:Pulse(target)
 
         end
 
+        if spec == 3 then
+            if not IsCurrentSpell(6603) then
+                localenv["StartAttack"]()
+            end
+            if not tt.LocalPlayer:HasBuff("Defensive Stance") then
+                tt:Cast("Defensive Stance", "player")
+            end
+            tt:Cast("Charge", target.pointer)
+            if caster ~= nil then
+                tt:Cast("Pummel", caster.pointer)
+            end
+            if not tt.LocalPlayer:HasBuff("Battle Shout") then
+                tt:Cast("Battle Shout", "player")
+            end
+            if not tt.LocalPlayer:HasBuff("Shield Block") then
+                tt:Cast("Shield Block", "player")
+            end
+            if not tt.LocalPlayer:HasBuff("Ignore Pain") then
+                tt:Cast("Ignore Pain", "player")
+            end
+
+            tt:Cast("Impending Victory", target.pointer)
+            tt:Cast("Shield Slam", target.pointer)
+            if tt.LocalPlayer:HasBuff("Ignore Pain") then
+                tt:Cast("Revenge", target.pointer)
+            end
+            tt:Cast("Thunder Clap", target.pointer)     
+        end
+
         if spec == 1 then
             if not IsCurrentSpell(6603) then
                 localenv["StartAttack"]()
             end
-
-            local caster = tt.CombatHelpers:GetClosestCaster(5)
             if caster ~= nil then
                 if tt:Cast("Pummel", caster.pointer) then return end
             end

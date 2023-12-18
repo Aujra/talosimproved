@@ -8,7 +8,7 @@ Paladin.class = "paladin"
 function Paladin:init()
 end
 
-function Paladin:Pull()
+function Paladin:OOC()
 end
 
 function Paladin:SetRange()
@@ -16,10 +16,6 @@ function Paladin:SetRange()
     tt.pullrange = 25
     
     if GetSpecialization() == 1 then
-        tt.combatrange = 35
-        tt.pullrange = 35
-    end
-    if GetSpecialization() == 4 then
         tt.combatrange = 35
         tt.pullrange = 35
     end
@@ -31,25 +27,13 @@ function Paladin:Pulse(target)
         return 
     end
 
+    tt.rotations.BaseRotation:Pulse(target)
+    target = tt.rotations.BaseRotation:NormalizeTarget(target)
+
     if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end      
+        tt.rotations.BaseRotation:Pulse(target)
 
-        local tarob = tt:GetObjectByGUID(target)
-        local x, y, z = dmc.GetUnitPosition("player")
-        local px, py, pz = dmc.GetUnitPosition(target.pointer)
-        if (px == nil) then
-            return
-        end
-        local dx, dy, dz = x-px, y-py, z-pz
-        local radians = math.atan2(-dy, -dx)
-        dmc.FaceDirection(radians, false)
-
-        if spec == 3 then
-            if target.Distance > 5 then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 3 then   
             tt:Cast("Blade of Justice", target.pointer)
             tt:Cast("Judgment", target.pointer)
             tt:Cast("Avenge Wrath", "player")
@@ -58,10 +42,7 @@ function Paladin:Pulse(target)
             tt:Cast("Crusader Strike", target.pointer)
         end
 
-        if spec == 2 then
-            if target.Distance > 5 then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 2 then  
             tt:Cast("Avenger's Shield", target.pointer)
             tt:Cast("Judgment", target.pointer)
             tt:Cast("Hammer of Wrath", target.pointer)
@@ -71,10 +52,7 @@ function Paladin:Pulse(target)
             tt:Cast("Hammer of the Righteous", target.pointer)
         end
 
-        if spec == 1 then
-            if target.Distance > 30 then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 1 then  
             local lowest = tt.CombatHelpers:LowestFriend()
             if lowest ~= nil then
                 if lowest.HP < 50 then

@@ -20,6 +20,12 @@ function Hunter:Pull()
     end
 end
 
+function Hunter:OOC()
+    if tt.LocalPlayer.pet == false then
+        localenv["CastSpellByName"]("Call Pet 1")
+    end
+end
+
 function Hunter:Pulse(target)
     local spec = GetSpecialization()
 
@@ -28,6 +34,7 @@ function Hunter:Pulse(target)
     end
 
     tt.rotations.BaseRotation:Pulse(target)
+    target = tt.rotations.BaseRotation:NormalizeTarget(target)
 
     if target ~= nil then
         local caster = tt.CombatHelpers:GetClosestCaster(30)
@@ -44,6 +51,10 @@ function Hunter:Pulse(target)
         end
 
         if spec == 3 then
+            tt:Cast("Harpoon", target.pointer)
+            tt:Cast("Kill Command", target.pointer)
+            tt:Cast("Wildfire Bomb", target.pointer)
+            tt:Cast("Raptor Strike", target.pointer)
         end
 
         if spec == 2 then  

@@ -1,5 +1,5 @@
 local tt = tt
-tt.rotations.Mage = class()
+tt.rotations.Mage = tt.rotations.BaseRotation:extend()
 local Mage = tt.rotations.Mage
 
 Mage.name = "Mage"
@@ -13,11 +13,10 @@ function Mage:SetRange()
     tt.pullrange = 35
 end
 
-function Mage:Pull()
-    if localenv["UnitAffectingCombat"]("player") then
-        return self:Pulse()
+function Mage:OOC()
+    if not tt.LocalPlayer:HasBuff("Arcane Intellect") then
+        tt:Cast("Arcane Intellect", "player")
     end
-    tt:Cast("Fireball", tar)
 end
 
 function Mage:Pulse(target)
@@ -27,21 +26,8 @@ function Mage:Pulse(target)
     end
 
     if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end      
-
-        local tarob = tt:GetObjectByGUID(target)
-        local x, y, z = dmc.GetUnitPosition("player")
-        local px, py, pz = dmc.GetUnitPosition(target.pointer)
-        if (px == nil) then
-            return
-        end
-        local dx, dy, dz = x-px, y-py, z-pz
-        local radians = math.atan2(-dy, -dx)
-        if tt.botbases[tt.botbase].allowMovement then
-            dmc.FaceDirection(radians, false)
-        end
+        tt.rotations.BaseRotation:Pulse(target)
+        target = tt.rotations.BaseRotation:NormalizeTarget(target)
 
         local caster = tt.CombatHelpers:GetClosestCaster(30)
 
@@ -49,10 +35,7 @@ function Mage:Pulse(target)
             tt:Cast("Counterspell", caster.pointer)
         end
 
-        if spec == 1 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end   
+        if spec == 1 then  
             if not tt.LocalPlayer:HasBuff("Arcane Power") then
                 tt:Cast("Arcane Power", "player")
             end
@@ -77,9 +60,6 @@ function Mage:Pulse(target)
         end
 
         if spec == 3 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
             if not tt.LocalPlayer:HasBuff("Icy Veins") then
                 tt:Cast("Icy Veins", "player")
             end
@@ -101,7 +81,6 @@ function Mage:Pulse(target)
         end
 
         if spec == 2 then
-            tt.rotations.BaseRotation:Pulse(target)
             if not tt.LocalPlayer:HasBuff("Blazing Barrier") then
                 tt:Cast("Blazing Barrier", "player")
             end

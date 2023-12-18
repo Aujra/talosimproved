@@ -43,7 +43,7 @@ function Druid:Pulse(target)
 
     if target ~= nil then
         tt.rotations.BaseRotation:Pulse(target)
-
+        target = self:NormalizeTarget(target)
         if spec == 1 then
             tt.combatrange = 30
             local caster = tt.CombatHelpers:GetClosestCaster(40)
@@ -130,6 +130,34 @@ function Druid:Pulse(target)
                 tt:Cast("Rake", target.pointer)
             end
             tt:Cast("Shred", target)
+        end
+
+        if spec == 3 then
+            if GetShapeshiftForm() ~= 1 then
+                tt:Cast("Bear Form", "player")
+            end
+            if tt.LocalPlayer.HP < 50 then
+                tt:Cast("Barkskin", "player")
+            end
+            if tt.LocalPlayer.HP < 40 then
+                tt:Cast("Renewal", "player")
+            end
+            if tt.LocalPlayer.HP < 30 then
+                tt:Cast("Survival Instincts", "player")
+            end
+            if tt.LocalPlayer.HP < 60 then
+                tt:Cast("Frenzied Regeneration", "player")
+            end
+            if tt.LocalPlayer.power > 50 then
+                tt:Cast("Iron Fur")
+            end
+            tt:Cast("Ironfur", "player")
+            tt:Cast("Wild Charge", target.pointer)
+            tt:Cast("Mangle", target.pointer)
+            if not target:HasDebuff("Moonfire", target.pointer) then
+                tt:Cast("Moonfire", target.pointer)
+            end
+            tt:Cast("Thrash", target.pointer)            
         end
 
         if spec == 4 then

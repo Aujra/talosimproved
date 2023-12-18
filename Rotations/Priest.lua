@@ -13,11 +13,10 @@ function Priest:SetRange()
     tt.pullrange = 35
 end
 
-function Priest:Pull()
-    if localenv["UnitAffectingCombat"]("player") then
-        return self:Pulse()
+function Priest:OOC()
+    if not tt.LocalPlayer:HasBuff("Power Word: Fortitude") then
+        tt:Cast("Power Word: Fortitude", "player")
     end
-    tt:Cast("Fireball", tar)
 end
 
 function Priest:Pulse(target)
@@ -27,46 +26,31 @@ function Priest:Pulse(target)
     end
 
     if target ~= nil then
-        if type(target) == "string" then
-            target = tt:GetObjectByGUID(target)
-        end      
-
-        local tarob = tt:GetObjectByGUID(target)
-        local x, y, z = dmc.GetUnitPosition("player")
-        local px, py, pz = dmc.GetUnitPosition(target.pointer)
-        if (px == nil) then
-            return
-        end
-        local dx, dy, dz = x-px, y-py, z-pz
-        local radians = math.atan2(-dy, -dx)
-        if tt.botbases[tt.botbase].allowMovement then
-            dmc.FaceDirection(radians, false)
-        end
-
+        tt.rotations.BaseRotation:Pulse(target)
+        target = tt.rotations.BaseRotation:NormalizeTarget(target)       
         local caster = tt.CombatHelpers:GetClosestCaster(30)
-
-        if caster ~= nil then
-            tt:Cast("Counterspell", caster.pointer)
-        end
-
         if spec == 1 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end   
-            local hasUI, isPriestPet = HasPetUI();
-            if not hasUI then
-                localenv["CastSpellByName"]("Call Pet 1")
+            local lowest = tt.CombatHelpers:LowestFriend()
+            if lowest ~= nil then
+                if lowest.HP < 90 and not lowest:HasBuff("Power Word: Shield") then
+                    tt:Cast("Power Word: Shield", lowest.pointer)
+                end
+                if lowest.HP < 85 and not lowest:HasBuff("Atonement") then
+                    tt:Cast("Power Word: Radiance", lowest.pointer)
+                end
+                if lowest.HP < 80 and not lowest:HasBuff("Renew") then
+                    tt:Cast("Renew", lowest.pointer)
+                end
             end
-            localenv["CastSpellByName"]("Kill Command")
-            localenv["CastSpellByName"]("Bestial Wrath")
-            localenv["CastSpellByName"]("Cobra Shot")
-            localenv["CastSpellByName"]("Barbed Shot")
+            tt:Cast("Mind Blast", target.pointer)
+            tt:Cast("Penance", target.pointer)
+            tt:Cast("Smite", target.pointer)
         end
 
-        if spec == 3 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
+        if spec == 3 then   
+            if caster ~= nil then
+                tt:Cast("Silence", caster.pointer)
+            end
             if not tt.LocalPlayer:HasBuff("Shadowform") then
                 localenv["CastSpellByName"]("Shadowform")
             end
@@ -87,19 +71,20 @@ function Priest:Pulse(target)
         end
 
         if spec == 2 then
-            if target.Distance > 30 and tt.botbases[tt.botbase].allowMovement then
-                tt:NavTo(target.x, target.y, target.z)
-            end     
-            if not target:HasDebuff("Priest's Mark") then
-                localenv["CastSpellByName"]("Priest's Mark", target.pointer)
+            local lowest = tt.CombatHelpers:LowestFriend()
+            if lowest ~= nil then
+                if lowest.HP < 90 then
+                    tt:Cast("Prayer of Mending", lowest.pointer)
+                end
+                if lowest.HP < 80 and not lowest:HasBuff("Renew") then
+                    tt:Cast("Renew", lowest.pointer)
+                end
+                if lowest.HP < 60 then
+                    tt:Cast("Flash Heal", lowest.pointer)
+                end
             end
-            localenv["CastSpellByName"]("Kill Shot")
-            localenv["CastSpellByName"]("Rapid Fire")
-            if tt.LocalPlayer:HasBuff("Precise Shots") then
-                localenv["CastSpellByName"]("Multi-Shot", target.pointer)
-            end
-            localenv["CastSpellByName"]("Aimed Shot", target.pointer)
-            localenv["CastSpellByName"]("Steady Shot", target.pointer)
+            tt:Cast("Holy Fire", target.pointer)
+            tt:Cast("Smite", target.pointer)
         end
     end
 end
