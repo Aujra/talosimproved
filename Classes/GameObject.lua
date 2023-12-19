@@ -11,6 +11,7 @@ function GameObject:init(point)
     self.score = 0
     self.radius = dmc.UnitBoundingRadius(point)
     self.NextUpdate = 0
+    self.isQuest = dmc.ObjectIsQuestObjective(point)
 end
 
 function GameObject:Update(point)
@@ -21,6 +22,7 @@ function GameObject:Update(point)
     self.Distance = dmc.GetDistance3D(x, y, z, self.x, self.y, self.z)
     self.radius = dmc.ObjectField(self.pointer, 0xD7A4, 10)
     self.NextUpdate = GetTime() + self:getUpdateRate()
+    self.isQuest = dmc.ObjectIsQuestObjective(self.pointer)
 end
 
 function GameObject:ToTable()

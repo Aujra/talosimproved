@@ -6,12 +6,14 @@ function Player:init(point)
     tt.Classes.Unit.init(self, point)
     self.power = localenv["UnitPower"](self.pointer)
     self.combo = localenv["UnitPower"](self.pointer, 4)
+    self.role = localenv["UnitGroupRolesAssigned"](self.pointer)
 end
 
 function Player:Update()
     tt.Classes.Unit.Update(self, point)
     self.power = localenv["UnitPower"](self.pointer)
     self.combo = localenv["UnitPower"](self.pointer, 4)
+    self.role = localenv["UnitGroupRolesAssigned"](self.pointer)
     self:Debug()
 end
 

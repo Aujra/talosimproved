@@ -14,6 +14,7 @@ function Unit:init(point)
     self.Dead = localenv["UnitIsDead"](self.pointer)
     self.targetScore = 0
     self.attackable = localenv["UnitCanAttack"]("player", point)
+    self.lootable = dmc.UnitIsLootable(point)
 end
 
 function Unit:Update()
@@ -23,6 +24,7 @@ function Unit:Update()
     self.HealthMax = localenv["UnitHealthMax"](self.pointer)
     self.HP = self.Health / self.HealthMax * 100
     self.attackable = localenv["UnitCanAttack"]("player", self.pointer)
+    self.lootable = dmc.UnitIsLootable(self.pointer)
     self.los = self:LOS()
 end
 
@@ -36,6 +38,13 @@ function Unit:IsCasting()
         return true
     end
     return false
+end
+
+function Unit:ToTable()
+    local table = {
+        self.Name, string.format("%0d", self.Distance), self.score, string.format("%2d", self.NextUpdate), self.isQuest
+    }
+    return table
 end
 
 function Unit:HasBuff(spell, byme)

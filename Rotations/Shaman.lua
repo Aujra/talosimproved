@@ -38,7 +38,23 @@ function Shaman:Pulse(target)
         end
 
         if spec == 3 then
-            
+            local lowest = tt.CombatHelpers:LowestFriend()
+            if not tt.LocalPlayer:HasBuff("Water Shield") then
+                tt:Cast("Water Shield", "player")
+            end
+            if lowest ~= nil then
+                if lowest.HP < 80 then
+                    tt:Cast("Riptide", lowest.pointer)
+                end
+                if lowest.HP < 75 then
+                    tt:Cast("Chain Heal", lowest.pointer)
+                end
+                if lowest.HP < 60 then
+                    tt:Cast("Healing Surge", lowest.pointer)
+                end                
+            end    
+            tt:Cast("Flame Shock", target.pointer)
+            tt:Cast("Lightning Bolt", target.pointer)        
         end
 
         if spec == 2 then

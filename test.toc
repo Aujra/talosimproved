@@ -43,6 +43,7 @@ Classes\Spot.lua
 BotBases\BGBot.lua
 BotBases\RotationBot.lua
 BotBases\DungeonBot.lua
+BotBases\QuestBot.lua
 
 Rotations\BaseRotation.lua
 Rotations\External.lua

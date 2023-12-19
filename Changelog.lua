@@ -7,4 +7,4 @@ tt.changelog = {
     "Fixed mounting"
 }
 
-tt.version = "1.0.1"
+tt.version = "1.0.2"

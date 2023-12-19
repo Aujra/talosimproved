@@ -139,6 +139,7 @@ if not OMFrame then
     tt:AddColumn("Distance")
     tt:AddColumn("Score")
     tt:AddColumn("Next Update")
+    tt:AddColumn("Lootable")
 
     if ScrollTable == nil then
         ScrollTable = ScrollingTable:CreateST(cols, nil, nil, nil, OMFrame.frame);
