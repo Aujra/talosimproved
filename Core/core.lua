@@ -1,7 +1,10 @@
 tt = {}
 tt.rotations = {}
 tt.botbases = {}
+tt.drawers = {}
+tt.drawtriggers = {}
 tt.Classes = {}
+tt.Drawing = {}
 tt.LocalPlayer = nil
 
 tt.time = GetTime()
@@ -52,7 +55,6 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
     if not tt.running then return end
     tt.time = tt.time + elapsed
     if tt.time > lastOMUpdate + .1 then
-
         if tt.mountID == nil then
             for i = 1, C_MountJournal.GetNumMounts(), 1 do
                 local creatureName, spellID, icon, active, isUsable, sourceType, isFavorite, isFactionSpecific, faction, hideOnChar, isCollected = C_MountJournal.GetMountInfoByID(i)
@@ -75,6 +77,11 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
             tt.draw:ClearCanvas()
             tt.scoredraw:ClearCanvas()
         end
+        
+        for k,v in pairs(tt.drawers) do
+            v:Pulse()
+        end
+
         tt.rotations[tt.rotation]:SetRange()
         tt.rotations[tt.rotation]:OOC()
         tt.botbases[tt.botbase]:Pulse()

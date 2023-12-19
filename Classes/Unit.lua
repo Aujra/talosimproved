@@ -47,6 +47,43 @@ function Unit:ToTable()
     return table
 end
 
+function Unit:IsCasting(id)
+    local name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, notInterruptible, spellId = localenv["UnitCastingInfo"](self.pointer)
+    local name2, text2, texture2, startTimeMS2, endTimeMS2, isTradeSkill2, castID2, notInterruptible2, spellId2 = localenv["UnitChannelInfo"](self.pointer)
+    if name ~= nil then
+        if spellId == id then
+            return true
+        end
+    end
+    if name2 ~= nil then
+        if spellId2 == id then
+            return true
+        end
+    end
+    return false
+end
+
+function Unit:HasBuffByID(id)
+    for i = 1, 40 do
+        local name, _, count, dispelType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, _, timeMod = localenv["UnitAura"](self.pointer, i, "HELPFUL")
+        if spellId == id then
+            return true
+        end
+    end
+    return false
+end
+
+function Unit:HasDebuffByID(id)
+    for i = 1, 40 do
+        local name, _, count, dispelType, duration, expirationTime, unitCaster, _, _, spellId, _, _, _, _, timeMod = localenv["UnitAura"](self.pointer, i, "HARMFUL")
+        print(spellId, id)
+        if spellId == id then
+            return true
+        end
+    end
+    return false
+end
+
 function Unit:HasBuff(spell, byme)
     byme = byme or false
     for i = 1, 40 do

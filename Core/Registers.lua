@@ -26,3 +26,7 @@ function tt:getRotationIndex(name)
         i = i + 1
     end
 end
+
+function tt:RegisterDrawer(name, drawer)
+    tt.drawers[name] = drawer
+end

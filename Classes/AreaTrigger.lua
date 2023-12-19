@@ -24,17 +24,13 @@ function AreaTrigger:Update()
     self.flags = dmc.UnitDynamicFlags(self.pointer)
     self.timeleft = self.initTime + self.duration - tt.time
     self.Distance = dmc.GetDistance3D(self.x, self.y, self.z, tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z)
-    self:Debug()
 end
 
 function AreaTrigger:Debug()
-    if draw == nil then
-        draw = dmc.Draw:New()
-    end
-    draw:ClearCanvas()
-    draw:Circle(self.x, self.y, self.z, self.radius, 0, 0, 1, 1)
-    --draw:FilledCircle(self.x, self.y, self.z, (self.radius/self.timeleft), 0, 0, 1, 0.2)
-    --draw:Text(self.timeleft, "GameFontNormal", self.x, self.y, self.z+5)
+
+end
+
+function AreaTrigger:draw()
 end
 
 function AreaTrigger:Destroy()

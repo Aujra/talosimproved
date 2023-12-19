@@ -39,6 +39,7 @@ Classes\Unit.lua
 Classes\Player.lua
 Classes\LocalPlayer.lua
 Classes\Spot.lua
+Classes\DrawTrigger.lua
 
 BotBases\BGBot.lua
 BotBases\RotationBot.lua
@@ -65,5 +66,7 @@ UI\ObjectViewer.lua
 UI\HUD.lua
 UI\ShowSpots.lua
 UI\Log.lua
+
+Drawing\Amirdrassil.lua
 
 ChangeLog.lua
