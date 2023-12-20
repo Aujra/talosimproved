@@ -27,10 +27,7 @@ tt.pullrange = 35
 local afkrest = 0
 local inited = false
 
-setfenv(1, localenv)
-
 tt.AceGUI = LibStub and LibStub("AceGUI-3.0", true)
-tt.chatcom = LibStub("AceAddon-3.0"):NewAddon("tt", "AceConsole-3.0")
 
 tt.frame = CreateFrame("Frame", "bro", UIParent)
 tt.frame:SetScript("OnUpdate", function(self, elapsed)
@@ -39,7 +36,7 @@ tt.frame:SetScript("OnUpdate", function(self, elapsed)
     end
     if GetTime() - afkrest > 30 then
         afkrest = GetTime()
-        dmc.ResetAfk()
+        ResetAfk()
     end
 
     if tt.draw == nil then

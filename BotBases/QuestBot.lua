@@ -43,7 +43,7 @@ function QuestBot:Pulse()
 
             destx = (dist * math.cos(angle)) + tt.LocalPlayer.x
             desty = (dist * math.sin(angle)) + tt.LocalPlayer.y
-            if dist > 5 then
+            if dist > 50 then
                 local flags = bit.bor(0x10, 0x100, 0x1)
                 local hit,x,y,z = dmc.TraceLine(destx,desty,tt.LocalPlayer.z-1000,destx,desty,tt.LocalPlayer.z+1000,flags)
                 tt:SetStatusText("Moving to quest "..dist .. " " .. hit .. " " .. x .. " " .. y .. " " .. z)
@@ -62,13 +62,22 @@ function QuestBot:Pulse()
             end
         end
     end
+    local closestquestobj = self:GetClosestQuestObjective()
+    if closestquestobj ~= nil then
+        tt:SetStatusText("Interacting with quest objective "..closestquestobj.Name)
+        tt:NavTo(closestquestobj.x, closestquestobj.y, closestquestobj.z)
+        if closestquestobj.Distance < tt.combatrange then
+            localenv["MoveForwardStop"]()
+            dmc.Interact(closestquestobj.pointer)
+        end     
+    end           
 end
 
 function QuestBot:GetClosestQuestObjective()
     local closest = nil
     local closestDist = 999999
     for k,v in pairs(tt.units) do
-        if v.isQuest and v.Distance < 40 then
+        if v.Distance < 150 and not v.Dead and v.Reaction <= 4 then
             local dist = dmc.GetDistance3D(tt.LocalPlayer.x, tt.LocalPlayer.y, tt.LocalPlayer.z, v.x, v.y, v.z)
             if dist < closestDist then
                 closest = v

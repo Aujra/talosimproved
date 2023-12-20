@@ -20,9 +20,9 @@ function tt:UpdateOM()
         for _, v in pairs(added) do 
             if dmc.ObjectType(v) == 11 then
                 if tt.areatriggers[v] then
-                    tt.areatriggers[v]:Update(v)
+                    --tt.areatriggers[v]:Update(v)
                 else
-                    tt.areatriggers[v] = tt.Classes.AreaTrigger(v)
+                    --tt.areatriggers[v] = tt.Classes.AreaTrigger(v)
                 end
             end
             if dmc.ObjectType(v) == 7 then

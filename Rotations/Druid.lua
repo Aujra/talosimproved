@@ -42,8 +42,23 @@ function Druid:Pulse(target)
     end
 
     if target ~= nil then
-        tt.rotations.BaseRotation:Pulse(target)
-        target = self:NormalizeTarget(target)
+        local x, y, z = dmc.GetUnitPosition("player")
+        local px, py, pz = dmc.GetUnitPosition(target.pointer)
+        if (px == nil) then
+            return
+        end
+        local dx, dy, dz = x-px, y-py, z-pz
+        local radians = math.atan2(-dy, -dx)
+        if tt.botbases[tt.botbase].allowMovement then
+            dmc.FaceDirection(radians, false)
+        end
+
+        if target.Distance > tt.combatrange then
+            tt:SetStatusText("Moving to target");
+            tt:NavTo(target.x, target.y, target.z, true)
+        else
+            C_Timer.After(0.5, function() localenv["MoveForwardStop"]() end)
+        end
         if spec == 1 then
             tt.combatrange = 30
             local caster = tt.CombatHelpers:GetClosestCaster(40)

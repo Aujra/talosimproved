@@ -13,56 +13,59 @@ end
 
 function DungeonBot:Pulse()
     if IsInInstance() then
-        local tank = self:GetTank()
-        tt:SetStatusText("Finding tank")
+        if not tt.LocalPlayer.role == "TANK" then
+            local tank = self:GetTank()
+            tt:SetStatusText("Finding tank")
 
-        local lootable = self:GetNearestLoot()
-        if lootable ~= nil and not localenv["UnitAffectingCombat"]("player") then
-            tt:SetStatusText("Looting "..lootable.Name)
-            tt:NavTo(lootable.x, lootable.y, lootable.z)
-            if lootable.Distance < 5 then
-                localenv["MoveForwardStop"]()
-                dmc.Interact(lootable.pointer)
+            local lootable = self:GetNearestLoot()
+            if lootable ~= nil and not localenv["UnitAffectingCombat"]("player") then
+                tt:SetStatusText("Looting "..lootable.Name)
+                tt:NavTo(lootable.x, lootable.y, lootable.z)
+                if lootable.Distance < 5 then
+                    localenv["MoveForwardStop"]()
+                    dmc.Interact(lootable.pointer)
+                end
+                return
             end
-            return
-        end
 
-        if tank ~= nil and tank.Distance > 30 then
-            DungeonBot.Tank = tank
-            tt:SetStatusText("Moving to tank "..tank.Name)
-            tt:NavTo(tank.x, tank.y, tank.z)
-        else
-            localenv["MoveForwardStop"]()
-            if tank ~= nil then
-                tt:SetStatusText("Assisting tank "..tank.Name)
-                localenv["AssistUnit"](tank.pointer)
-                local target = dmc.UnitTarget("player")
-                target = tt.rotations.BaseRotation:NormalizeTarget(target)
-                if target ~= nil and localenv["UnitAffectingCombat"](target.pointer) then
-                    DungeonBot.Target = target
-                    tt:SetStatusText("Fighting "..target.Name)
-                    if target.Distance > tt.combatrange then
-                        tt:NavTo(target.x, target.y, target.z)
-                    else
-                        tt.rotations[tt.rotation]:Pulse(target)
+            if tank ~= nil and tank.Distance > 30 then
+                DungeonBot.Tank = tank
+                tt:SetStatusText("Moving to tank "..tank.Name)
+                tt:NavTo(tank.x, tank.y, tank.z)
+            else
+                localenv["MoveForwardStop"]()
+                if tank ~= nil then
+                    tt:SetStatusText("Assisting tank "..tank.Name)
+                    localenv["AssistUnit"](tank.pointer)
+                    local target = dmc.UnitTarget("player")
+                    target = tt.rotations.BaseRotation:NormalizeTarget(target)
+                    if target ~= nil and localenv["UnitAffectingCombat"](target.pointer) then
+                        DungeonBot.Target = target
+                        tt:SetStatusText("Fighting "..target.Name)
+                        if target.Distance > tt.combatrange then
+                            tt:NavTo(target.x, target.y, target.z)
+                        else
+                            tt.rotations[tt.rotation]:Pulse(target)
+                        end
                     end
                 end
             end
-        end
-    else
-        if (select(1,GetLFGQueueStats(LE_LFG_CATEGORY_LFD))) == nil then
-            tt:SetStatusText("Queueing for dungeon")
-            if not LFDQueueFrame:IsVisible() then
-                LFDMicroButton:Click()
-            else
-                if GetLFGMode(LE_LFG_CATEGORY_LFD) ~= "queued" then
-                    localenv["RunMacroText"]("/click LFDQueueFrameFindGroupButton")
-                end
-            end
         else
-            tt:SetStatusText("Waiting for dungeon")
-            if LFGDungeonReadyDialogEnterDungeonButton and LFGDungeonReadyDialogEnterDungeonButton:IsShown() then
-                localenv["RunMacroText"]("/click LFGDungeonReadyDialogEnterDungeonButton")
+            if (select(1,GetLFGQueueStats(LE_LFG_CATEGORY_LFD))) == nil then
+                tt:SetStatusText("Queueing for dungeon")
+                if not LFDQueueFrame:IsVisible() then
+                    LFDMicroButton:Click()
+                else
+                    if GetLFGMode(LE_LFG_CATEGORY_LFD) ~= "queued" and GetLFGMode(LE_LFG_CATEGORY_LFD) ~= "proposal" then
+                        localenv["RunMacroText"]("/click LFDQueueFrameFindGroupButton")
+                    end
+                end
+            else
+                tt:SetStatusText("Waiting for dungeon")
+                if LFGDungeonReadyDialog and LFGDungeonReadyDialog:IsShown() then
+                    print("time to enter")
+                    localenv["RunMacroText"]("/click LFGDungeonReadyDialogEnterDungeonButton")
+                end
             end
         end
     end

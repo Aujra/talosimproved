@@ -54,7 +54,8 @@ function Shaman:Pulse(target)
                 end                
             end    
             tt:Cast("Flame Shock", target.pointer)
-            tt:Cast("Lightning Bolt", target.pointer)        
+            tt:Cast("Lava Burst", target.pointer)
+            tt:Cast("Chain Lightning", target.pointer)        
         end
 
         if spec == 2 then

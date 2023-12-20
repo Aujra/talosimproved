@@ -23,7 +23,6 @@ tt.besttarget = nil
 
 local bestmove = nil
 local besttarget = nil
-local nextpulse = 0
 
 tt.bgdraw = dmc.Draw:New()
 
@@ -38,26 +37,6 @@ tinsert(tt.movespot, spots)
 tinsert(tt.movespot, spot2)
 
 function BGBot:HandleOutsideBG()
-    if GetTime() - nextpulse < 4 then
-        return
-    end
-    if HonorFrameQueueButton == nil or not HonorFrameQueueButton:IsVisible() and GetBattlefieldStatus(1) ~= "queued" then
-        TogglePVPUI()
-      end
-      if GetBattlefieldStatus(1) ~= "queued" and GetBattlefieldStatus(1) ~= "confirm" then
-        localenv["RunMacroText"]("/click HonorFrameQueueButton")
-        tt:SetStatusText("Queueing for BG")
-    end
-    if GetBattlefieldStatus(1) == "queued" then
-        tt:SetStatusText("Waiting for BG to pop currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
-        if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
-            TogglePVPUI()
-        end
-    end                                                 
-    if GetBattlefieldStatus(1) == "confirm" then             
-      localenv["AcceptBattlefieldPort"](1, true)
-      tt:SetStatusText("Accepting BG")
-    end
 end
 
 function BGBot:Pulse()
@@ -67,7 +46,24 @@ function BGBot:Pulse()
     tt.LocalPlayer:HasBuff("Regrowth")
 
     if not UnitInBattleground("player") then
-        self:HandleOutsideBG()       
+        self:HandleOutsideBG()
+        if HonorFrameQueueButton == nil or not HonorFrameQueueButton:IsVisible() and GetBattlefieldStatus(1) ~= "queued" then
+          TogglePVPUI()
+        end
+        if GetBattlefieldStatus(1) ~= "queued" and GetBattlefieldStatus(1) ~= "confirm" then
+            localenv["RunMacroText"]("/click HonorFrameQueueButton")
+            tt:SetStatusText("Queueing for BG")
+        end
+        if GetBattlefieldStatus(1) == "queued" then
+            tt:SetStatusText("Waiting for BG to pop currently waited " .. tt:ConvertToMS(GetBattlefieldTimeWaited(1)))
+            if PVPQueueFrame ~= nil and PVPQueueFrame:IsVisible() then
+                TogglePVPUI()
+            end
+        end                                                 
+        if GetBattlefieldStatus(1) == "confirm" then             
+          localenv["AcceptBattlefieldPort"](1, true)
+          tt:SetStatusText("Accepting BG")
+        end
     else
         local role = UnitGroupRolesAssigned("player")
 
@@ -77,9 +73,6 @@ function BGBot:Pulse()
 
         self:BuildMoveScores()
         self:BuildTargetScores()
-        if role == "HEALER" then
-            self:BuildHealScore()
-        end
 
         if GetBattlefieldWinner() then
             LeaveBattlefield()
@@ -114,10 +107,6 @@ function BGBot:Pulse()
         end
 
         if self:InMoveSpot() then
-            return
-        end
-
-        if GetTime() - nextpulse < 0.5 then
             return
         end
 
@@ -248,36 +237,6 @@ function BGBot:BuildTargetScores()
     lasttargetupdate = GetTime()
 end
 
-function BGBot:BuildHealScore()
-    if GetTime() - lasttargetupdate < 2.5 then
-        return
-    end
-
-    for k,v in pairs(tt.PVPTargetScores) do tt.PVPTargetScores[k] = nil end
-
-    for k,v in pairs(tt.players) do
-        if not v.Dead and v.Reaction >= 5 and v.Distance ~= nil and v.Distance < 100 and not v:LOS() then
-            local score = 50000
-            if v.Distance == nil then
-                score = score - 100000
-            else
-                score = score - v.Distance
-            end
-            if v.Distance ~= nil and v.Distance < 15 then
-                score = score + 100000
-            end
-            score = score + (v.maxHealth - v.Health)
-            v.targetScore = score
-            tinsert(tt.PVPTargetScores, {score = score, player = v})
-        end
-    end
-    table.sort(tt.PVPTargetScores, function(x, y)
-        return 
-        x.score > y.score
-    end)
-    lasttargetupdate = GetTime()
-end
-
 function BGBot:InMoveSpot()
     local x, y, z = dmc.GetUnitPosition("player")
     for k,v in pairs(tt.movespot) do
@@ -315,8 +274,7 @@ function BGBot:ClosestTarget()
     local closestdist = 999999
     for k,v in pairs(tt.players) do
         if v.pointer ~= "player" then
-            if v.Distance ~= nil and v.Distance < 150 and v.Distance < closestdist and v.Reaction <= 3 and not v.Dead
-            then
+            if v.Distance ~= nil and v.Distance < 150 and v.Distance < closestdist and v.Reaction <= 3 and not v.Dead then
             --and not v.LOS() then
                 closestdist = v.Distance
                 closest = v

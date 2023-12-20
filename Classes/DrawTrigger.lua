@@ -22,7 +22,6 @@ function DrawTrigger:Draw()
     end
     if self.from == "target" then
         x,y,z = dmc.GetUnitPosition("target")
-        print("Target is at " .. x .. " " .. y .. " " .. z)
     end
     tt.draw:SetColor(self.color.r, self.color.g, self.color.b, self.color.a)
     if self.shape == "circle" then
